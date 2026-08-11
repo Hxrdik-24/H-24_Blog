@@ -47,7 +47,9 @@ app.config["CACHE_TYPE"] = os.getenv("CACHE_TYPE")
 app.config["CACHE_DEFAULT_TIMEOUT"] = int(
     os.getenv("CACHE_DEFAULT_TIMEOUT", "3600")
 )
-
+app.config["REMEMBER_COOKIE_HTTPONLY"] = True
+app.config["REMEMBER_COOKIE_SECURE"] = True
+app.config["REMEMBER_COOKIE_SAMESITE"] = "Lax"
 cache.init_app(app)
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
@@ -62,6 +64,7 @@ app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+
 
 mail = Mail(app)
 

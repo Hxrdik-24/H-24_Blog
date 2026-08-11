@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms  import StringField , PasswordField , SubmitField , BooleanField , FileField  , TextAreaField , HiddenField
-from wtforms.validators import DataRequired , Length , Email , EqualTo , ValidationError 
+from wtforms  import StringField , PasswordField , SubmitField , BooleanField , FileField   , HiddenField
+from wtforms.validators import DataRequired , Length , Email , EqualTo , ValidationError , Regexp
 from app.models import User
 from flask_wtf.file import FileAllowed 
 from flask_login import current_user
@@ -66,3 +66,15 @@ class UpdatePost(FlaskForm):
     title = StringField("Title",validators=[DataRequired(),Length(min=2,max=80) ])
     content =  HiddenField("POST CONTENT",validators=[DataRequired()])
     submit = SubmitField("POST")
+
+class OTPForm(FlaskForm):
+    otp = StringField(
+        "OTP",
+        validators=[
+            DataRequired(),
+            Length(min=6, max=6),
+            Regexp(r'^\d{6}$', message="OTP must be exactly 6 digits.")
+        ]
+    )
+
+    submit = SubmitField("Verify")

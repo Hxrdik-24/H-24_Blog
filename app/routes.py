@@ -1,6 +1,6 @@
 from app import app , db , bcrypt , cache
-from flask import render_template , flash , url_for , redirect 
-from app.forms import registration, LoginForm , UpdateProfile , createPost , UpdatePost
+from flask import render_template , flash , url_for , redirect ,send_from_directory
+from app.forms import registration, LoginForm , UpdateProfile , createPost , UpdatePost ,OTPForm
 from app.models import  User ,Post
 from flask import request
 from flask_login import login_user , current_user , logout_user , login_required
@@ -353,3 +353,14 @@ def add_security_headers(response):
     response.headers["X-Frame-Options"] = "SAMEORIGIN"
     response.headers['Content-Security-Policy'] = "frame-ancestors 'self'"
     return response
+
+@app.route('/2fa')
+def Twofa():
+    form = OTPForm()
+    if form.validate_on_submit():
+        print(form.otp.data)
+    return render_template('2fa.html',form=form)
+
+@app.route('/google7c80791f63896477.html')
+def google_verification():
+    return  send_from_directory('.', 'google7c80791f63896477.html')

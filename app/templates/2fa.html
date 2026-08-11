@@ -1,0 +1,63 @@
+```jinja2
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+
+            <div class="card shadow border-0 rounded-4">
+                <div class="card-body p-4">
+
+                    <h3 class="text-center mb-2">Verify OTP</h3>
+                    <p class="text-center text-muted mb-4">
+                        Enter the 6-digit OTP sent to your email.
+                    </p>
+
+                    <form method="POST" novalidate>
+                        {{ form.hidden_tag() }}
+
+                        <div class="mb-3">
+                            {{ form.otp.label(class="form-label fw-bold") }}
+
+                            {% if form.otp.errors %}
+                                {{ form.otp(
+                                    class="form-control rounded-pill is-invalid text-center",
+                                    placeholder="Enter OTP",
+                                    maxlength="6",
+                                    autocomplete="one-time-code",
+                                    inputmode="numeric"
+                                ) }}
+
+                                <div class="invalid-feedback">
+                                    {% for error in form.otp.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.otp(
+                                    class="form-control rounded-pill text-center",
+                                    placeholder="Enter OTP",
+                                    maxlength="6",
+                                    autocomplete="one-time-code",
+                                    inputmode="numeric"
+                                ) }}
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid">
+                            {{ form.submit(
+                                class="btn btn-primary rounded-pill py-2"
+                            ) }}
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock content %}
+```

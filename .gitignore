@@ -2,7 +2,7 @@
 venv/
 env/
 .env
-
+test.py
 # Python Compiled Files
 __pycache__/
 *.pyc
