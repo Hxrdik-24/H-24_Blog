@@ -15,7 +15,33 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
 #---------------------------------------------
+from flask import make_response
 
+@app.route('/sitemap.xml')
+def sitemap():
+    base_url = request.host_url.rstrip('/') 
+    pages = [
+        {'loc': f'{base_url}/', 'priority': '1.0'},
+        {'loc': f'{base_url}/about', 'priority': '0.8'},
+        {'loc': f'{base_url}/login', 'priority': '0.8'},
+        {'loc': f'{base_url}/register', 'priority': '0.8'},
+        # Agar aur pages hain toh unhe yahan add kar sakte hain
+    ]
+    
+    xml_content = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    xml_content += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    
+    for page in pages:
+        xml_content += '  <url>\n'
+        xml_content += f"    <loc>{page['loc']}</loc>\n"
+        xml_content += f"    <priority>{page['priority']}</priority>\n"
+        xml_content += '  </url>\n'
+        
+    xml_content += '</urlset>'
+    
+    response = make_response(xml_content)
+    response.headers["Content-Type"] = "application/xml"
+    return response
 
 logging.getLogger("werkzeug").disabled = True
 
