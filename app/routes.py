@@ -14,6 +14,9 @@ from flask import abort
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
+from flask import request, jsonify
+
+
 #---------------------------------------------
 from flask import make_response
 
@@ -25,7 +28,7 @@ def sitemap():
         {'loc': f'{base_url}/about', 'priority': '0.8'},
         {'loc': f'{base_url}/login', 'priority': '0.8'},
         {'loc': f'{base_url}/register', 'priority': '0.8'},
-        # Agar aur pages hain toh unhe yahan add kar sakte hain
+      
     ]
     
     xml_content = '<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -225,6 +228,7 @@ def logout():
     return redirect(url_for('home'))
 
 def save_img(form_img):
+    
     if current_user.public_id:
         cloudinary.uploader.destroy(current_user.public_id)
     random_hex = secrets.token_hex(8)
@@ -235,29 +239,58 @@ def save_img(form_img):
         overwrite = True
     ) 
     
-    return response
-from flask import request, jsonify
-import cloudinary.uploader
-
-@app.route('/upload-image', methods=['POST'])
+    return response@app.route('/upload-image', methods=['POST'])
 def upload_image():
-    if 'image' not in request.files:
-        return jsonify({'success': False, 'message': 'No file part'})
-    
-    file = request.files['image']
-    
-    if file.filename == '':
-        return jsonify({'success': False, 'message': 'No selected file'})
-    
-    try:
-        # Cloudinary par image upload kar rahe hain
-        upload_result = cloudinary.uploader.upload(file)
-        image_url = upload_result.get('secure_url') # Cloudinary ka permanent URL
-        
-        return jsonify({'success': True, 'url': image_url})
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)})
 
+    MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB
+    MIN_FREE_STORAGE = 200 * 1024 * 1024  # 200 MB
+
+    if 'image' not in request.files:
+        return jsonify({
+            'success': False,
+            'message': 'No file part'
+        })
+
+    file = request.files['image']
+
+    if file.filename == '':
+        return jsonify({
+            'success': False,
+            'message': 'No selected file'
+        })
+
+    try:
+        # Get actual file size
+        file.seek(0, 2)
+        file_size = file.tell()
+        file.seek(0)
+
+        # Individual file limit
+        if file_size > MAX_FILE_SIZE:
+            return jsonify({
+                'success': False,
+                'message': 'File too large. Maximum size is 5 MB.'
+            })
+
+        # TODO:
+        # Yaha Cloudinary ki remaining storage check karni hai.
+        # Agar remaining <= 200 MB:
+        #     upload block karna hai.
+
+        upload_result = cloudinary.uploader.upload(file)
+
+        image_url = upload_result.get('secure_url')
+
+        return jsonify({
+            'success': True,
+            'url': image_url
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        })
 @app.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():

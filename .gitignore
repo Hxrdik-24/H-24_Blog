@@ -2,8 +2,9 @@
 venv/
 env/
 .env
-test.py
 # Python Compiled Files
+test.py
+autopush.py
 __pycache__/
 *.pyc
 
