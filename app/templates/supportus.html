@@ -1,0 +1,121 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<style>
+    .real-coffee-card{
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius:16px;
+        padding:55px 60px;
+        text-align:center;
+        box-shadow:0 20px 40px rgba(0,0,0,.25);
+        max-width:420px;
+        margin:0 auto;
+        transition: all 0.3s ease;
+    }
+
+    .mug-wrap{
+        position:relative;
+        width:140px;height:140px;
+        margin:0 auto 15px auto;
+        display:flex;align-items:center;justify-content:center;
+        border-radius:50%;
+        background:radial-gradient(circle, rgba(247,183,51,.15) 0%, rgba(247,183,51,0) 70%);
+    }
+
+    .mug-wrap i{
+        font-size:64px;
+        color:#f7b733;
+        filter:drop-shadow(0 4px 10px rgba(247,183,51,.35));
+        animation:mugPulse 2.4s ease-in-out infinite;
+    }
+
+    @keyframes mugPulse{
+        0%,100%{ transform:scale(1); }
+        50%{ transform:scale(1.06); }
+    }
+
+    .steam{
+        position:absolute;
+        top:8px;
+        display:flex;gap:10px;
+    }
+    .steam span{
+        width:5px;height:26px;
+        background:rgba(203,213,225,.55);
+        border-radius:50%;
+        filter:blur(3px);
+        opacity:0;
+        animation:steamRise 2.4s infinite ease-out;
+    }
+    .steam span:nth-child(1){ animation-delay:0s; }
+    .steam span:nth-child(2){ animation-delay:.6s; }
+    .steam span:nth-child(3){ animation-delay:1.2s; }
+
+    @keyframes steamRise{
+        0%{ transform:translateY(15px) scaleX(1); opacity:0; }
+        30%{ opacity:.6; }
+        100%{ transform:translateY(-35px) scaleX(2.2); opacity:0; }
+    }
+
+    .real-coffee-card h1{ color: var(--text-color); margin:15px 0 10px; font-size:1.8rem; }
+    .real-coffee-card p{ color:#94a3b8; margin-bottom:20px; line-height:1.5; }
+    .real-coffee-card .btn-coffee{
+        display:inline-block;background:#f7b733;color:#1a1a1a;
+        padding:14px 40px;border-radius:50px;font-weight:700;
+        text-decoration:none;box-shadow:0 6px 14px rgba(247,183,51,.3);
+        transition:transform .2s ease;
+    }
+    .real-coffee-card .btn-coffee:hover{ transform:translateY(-3px); color:#1a1a1a; }
+    .real-coffee-card small{ color:#64748b; display:block; margin-top:22px; }
+</style>
+
+<div class="container-fluid py-5">
+    <div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+        <div class="col-12 text-center">
+
+            <div class="real-coffee-card">
+                <div class="mug-wrap">
+                    <div class="steam">
+                        <span></span><span></span><span></span>
+                    </div>
+                    <i class="fa-solid fa-mug-hot"></i>
+                </div>
+                <h1>Fuel the Code! ☕</h1>
+                <p>If my tools, CTF writeups, or Flask projects helped you out, consider supporting the caffeine behind H-24! 🚀</p>
+                <button type="button" class="btn btn-warning btn-lg px-5 py-3 font-weight-bold text-dark shadow-sm" style="border-radius: 50px;" data-toggle="modal" data-target="#upiModal">
+                    <i class="fas fa-mug-hot mr-2"></i> Buy Me a Coffee
+                </button>
+                <small><i class="fa-solid fa-terminal mr-1"></i> Powered by Python, Coffee & Late Nights</small>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- UPI QR Code Modal (Popup) -->
+<div class="modal fade" id="upiModal" tabindex="-1" role="dialog" aria-labelledby="upiModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content real-coffee-card p-4 text-center">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title font-weight-bold w-100" style="color: var(--text-color);" id="upiModalLabel">Scan & Pay via UPI ☕</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small mb-3">Scan this QR code using any UPI app (GPay, PhonePe, Paytm)</p>
+                
+                <!-- QR Code Image Container -->
+                <div class="p-3 bg-white rounded shadow-sm d-inline-block">
+                    <img src="{{ url_for('static', filename='images/upi.jpeg') }}" alt="UPI QR Code" class="img-fluid rounded" style="max-width: 220px; height: auto;">
+                </div>
+
+                <div class="mt-3">
+                    <span class="badge badge-success px-3 py-2 font-weight-normal">Thank you for supporting H-24! 🚀</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

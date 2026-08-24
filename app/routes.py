@@ -13,12 +13,9 @@ import logging
 from flask import abort
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-
 from flask import request, jsonify
-
-
-#---------------------------------------------
 from flask import make_response
+#---------------------------------------------
 
 @app.route('/sitemap.xml')
 def sitemap():
@@ -239,7 +236,8 @@ def save_img(form_img):
         overwrite = True
     ) 
     
-    return response@app.route('/upload-image', methods=['POST'])
+    return response
+@app.route('/upload-image', methods=['POST'])
 def upload_image():
 
     MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB
@@ -419,6 +417,10 @@ def Twofa():
     if form.validate_on_submit():
         print(form.otp.data)
     return render_template('2fa.html',form=form)
+
+@app.route('/supportus')
+def sup():
+    return render_template('supportus.html')
 
 # @app.route('/google7c80791f63896477.html')
 # def google_verification():
