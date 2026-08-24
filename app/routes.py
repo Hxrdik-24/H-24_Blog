@@ -420,6 +420,6 @@ def Twofa():
         print(form.otp.data)
     return render_template('2fa.html',form=form)
 
-@app.route('/google7c80791f63896477.html')
-def google_verification():
-    return  send_from_directory('.', 'google7c80791f63896477.html')
+# @app.route('/google7c80791f63896477.html')
+# def google_verification():
+#     return  send_from_directory('.', 'google7c80791f63896477.html')
