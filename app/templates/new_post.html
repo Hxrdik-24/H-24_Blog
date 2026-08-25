@@ -1,39 +1,42 @@
 {% extends "layout.html" %}
 {% block content %}
+
 <style>
-    /* Quill Editor ke andar custom font options apply karne ke liye */
 .ql-font-serif {
-    font-family: Georgia, Times New Roman, serif;
+    font-family: Georgia, "Times New Roman", serif;
 }
+
 .ql-font-monospace {
-    font-family: 'Courier New', Courier, monospace;
+    font-family: "Courier New", Courier, monospace;
 }
-/* Agar tu 'code' ya hacker vibe ke liye Fira Code ya JetBrains Mono use kar raha hai */
+
 .ql-container {
-    font-family: inherit; /* Tera VS Code dark mode font inherit kar lega */
+    font-family: inherit;
     font-size: 16px;
 }
-/* Quill Toolbar ko VS Code Dark Mode aur Neon Vibe dene ke liye */
+
+/* =========================
+   QUILL TOOLBAR
+========================= */
+
 .ql-toolbar.ql-snow {
     background-color: #1e1e1e !important;
     border: 1px solid rgba(0, 255, 102, 0.3) !important;
     border-radius: 6px 6px 0 0;
 }
 
-/* Toolbar ke saare icons aur text ko white/bright karna */
 .ql-toolbar.ql-snow .ql-stroke {
-    stroke: #00ff66 !important; /* Icons ki outline neon green ho jayegi */
+    stroke: #00ff66 !important;
 }
 
 .ql-toolbar.ql-snow .ql-fill {
-    fill: #00ff66 !important; /* Icons ka andar ka hissa */
+    fill: #00ff66 !important;
 }
 
 .ql-toolbar.ql-snow .ql-picker {
-    color: #ffffff !important; /* Dropdown ka text white dikhega */
+    color: #ffffff !important;
 }
 
-/* Dropdown ke andar ke options ko dark background aur white text dena */
 .ql-toolbar.ql-snow .ql-picker-options {
     background-color: #252526 !important;
     border: 1px solid rgba(0, 255, 102, 0.3) !important;
@@ -49,7 +52,10 @@
     background-color: #1e1e1e !important;
 }
 
-/* Editor box ka background aur text color */
+/* =========================
+   QUILL EDITOR
+========================= */
+
 .ql-container.ql-snow {
     background-color: #1e1e1e !important;
     color: #ffffff !important;
@@ -57,186 +63,972 @@
     border-radius: 0 0 6px 6px;
     font-family: inherit;
 }
+
+/* =========================
+   GRAMMAR SIDEBAR
+========================= */
+
+.grammar-sidebar {
+    background: #1e1e1e;
+    border: 1px solid rgba(0, 255, 102, 0.3);
+    border-radius: 8px;
+    padding: 20px;
+    color: #ffffff;
+    height: 100%;
+}
+
+.grammar-sidebar h3 {
+    font-size: 1rem;
+    color: #00ff66;
+    margin-bottom: 15px;
+}
+
+.suggestion-card {
+    background: #252526;
+    border: 1px solid rgba(0, 255, 102, 0.2);
+    border-left: 4px solid #00ff66;
+    padding: 12px;
+    border-radius: 6px;
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.suggestion-card.active {
+    display: flex;
+}
+
+.suggestion-text {
+    font-size: 0.95rem;
+    color: #d4d4d4;
+}
+
+.suggestion-text span {
+    font-weight: bold;
+    color: #00ff66;
+    white-space: pre-wrap;
+}
+
+.apply-btn {
+    background-color: #00ff66;
+    color: #1e1e1e;
+    border: none;
+    padding: 10px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    width: 100%;
+}
+
+.apply-btn:hover {
+    background-color: #00cc52;
+}
+
+.apply-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.no-suggestion {
+    color: #858585;
+    font-size: 0.9rem;
+    font-style: italic;
+    margin-top: 10px;
+}
 </style>
-<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
+
+
+<link
+    href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css"
+    rel="stylesheet"
+>
+
 
 <div class="container mt-4">
-    <div class="card shadow">
+
+    <div class="card shadow bg-dark border-secondary">
+
         <div class="card-body">
 
             <form method="POST" id="postForm">
 
                 {{ form.hidden_tag() }}
 
+                <!-- TITLE -->
+
                 <div class="mb-3">
-                    {{ form.title.label(class="form-label") }}
-                    {{ form.title(class="form-control") }}
+
+                    {{ form.title.label(class="form-label text-light") }}
+
+                    {{ form.title(
+                        class="form-control bg-secondary text-light border-0"
+                    ) }}
+
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Content</label>
 
-                    <div id="toolbar">
-                        <!-- Font Family aur Size -->
-                        <span class="ql-formats">
-                            <select class="ql-font">
-                                <!-- By default Quill ke kuch standard fonts, tu chahe toh aur add kar sakta hai -->
-                                <option selected></option>
-                                <option value="serif">Serif</option>
-                                <option value="monospace">Monospace</option>
-                            </select>
-                            <select class="ql-size">
-                                <option value="small"></option>
-                                <option selected></option>
-                                <option value="large"></option>
-                                <option value="huge"></option>
-                            </select>
-                        </span>
-                    
-                        <!-- Headers -->
-                        <span class="ql-formats">
-                            <select class="ql-header"></select>
-                        </span>
-                    
-                        <!-- Text Formatting -->
-                        <span class="ql-formats">
-                            <button class="ql-bold"></button>
-                            <button class="ql-italic"></button>
-                            <button class="ql-underline"></button>
-                            <button class="ql-strike"></button>
-                        </span>
-                    
-                        <!-- Colors (Text Color & Background Highlight) -->
-                        <span class="ql-formats">
-                            <select class="ql-color"></select>
-                            <select class="ql-background"></select>
-                        </span>
-                    
-                        <!-- Text Alignment -->
-                        <span class="ql-formats">
-                            <button class="ql-align" value=""></button>
-                            <button class="ql-align" value="center"></button>
-                            <button class="ql-align" value="right"></button>
-                            <button class="ql-align" value="justify"></button>
-                        </span>
-                    
-                        <!-- Quotes & Code Blocks -->
-                        <span class="ql-formats">
-                            <button class="ql-blockquote"></button>
-                            <button class="ql-code-block"></button>
-                        </span>
-                    
-                        <!-- Lists -->
-                        <span class="ql-formats">
-                            <button class="ql-list" value="ordered"></button>
-                            <button class="ql-list" value="bullet"></button>
-                        </span>
-                    
-                        <!-- Media & Links -->
-                        <span class="ql-formats">
-                            <button class="ql-link"></button>
-                            <button class="ql-image"></button>
-                        </span>
-                    
-                        <!-- Clear Formatting -->
-                        <span class="ql-formats">
-                            <button class="ql-clean"></button>
-                        </span>
+                <div class="row">
+
+                    <!-- =========================
+                         LEFT: EDITOR
+                    ========================== -->
+
+                    <div class="col-lg-8 mb-3">
+
+                        <label class="form-label text-light">
+                            Content
+                        </label>
+
+
+                        <!-- TOOLBAR -->
+
+                        <div id="toolbar">
+
+                            <span class="ql-formats">
+
+                                <select class="ql-font">
+                                    <option selected></option>
+                                    <option value="serif">Serif</option>
+                                    <option value="monospace">Monospace</option>
+                                </select>
+
+                                <select class="ql-size">
+                                    <option value="small"></option>
+                                    <option selected></option>
+                                    <option value="large"></option>
+                                    <option value="huge"></option>
+                                </select>
+
+                            </span>
+
+
+                            <!-- HEADERS -->
+
+                            <span class="ql-formats">
+
+                                <select class="ql-header"></select>
+
+                            </span>
+
+
+                            <!-- TEXT -->
+
+                            <span class="ql-formats">
+
+                                <button class="ql-bold"></button>
+                                <button class="ql-italic"></button>
+                                <button class="ql-underline"></button>
+                                <button class="ql-strike"></button>
+
+                            </span>
+
+
+                            <!-- COLORS -->
+
+                            <span class="ql-formats">
+
+                                <select class="ql-color"></select>
+                                <select class="ql-background"></select>
+
+                            </span>
+
+
+                            <!-- ALIGN -->
+
+                            <span class="ql-formats">
+
+                                <button class="ql-align" value=""></button>
+
+                                <button
+                                    class="ql-align"
+                                    value="center"
+                                ></button>
+
+                                <button
+                                    class="ql-align"
+                                    value="right"
+                                ></button>
+
+                                <button
+                                    class="ql-align"
+                                    value="justify"
+                                ></button>
+
+                            </span>
+
+
+                            <!-- QUOTE -->
+
+                            <span class="ql-formats">
+
+                                <button class="ql-blockquote"></button>
+                                <button class="ql-code-block"></button>
+
+                            </span>
+
+
+                            <!-- LISTS -->
+
+                            <span class="ql-formats">
+
+                                <button
+                                    class="ql-list"
+                                    value="ordered"
+                                ></button>
+
+                                <button
+                                    class="ql-list"
+                                    value="bullet"
+                                ></button>
+
+                            </span>
+
+
+                            <!-- MEDIA -->
+
+                            <span class="ql-formats">
+
+                                <button class="ql-link"></button>
+                                <button class="ql-image"></button>
+
+                            </span>
+
+
+                            <!-- CLEAN -->
+
+                            <span class="ql-formats">
+
+                                <button class="ql-clean"></button>
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- EDITOR -->
+
+                        <div
+                            id="editor"
+                            style="height:350px;"
+                        ></div>
+
+
+                        <!-- HIDDEN FORM INPUT -->
+
+                        {{ form.content(id="content") }}
+
+
+                        {% for error in form.content.errors %}
+
+                            <div class="text-danger mt-1">
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
+
                     </div>
 
-                    <!-- Quill Editor Container -->
-                    <div id="editor" style="height:350px;"></div>
 
-                    <!-- WTForms Hidden Field -->
-                    {{ form.content(id="content") }}
-                    
-                    <!-- Error handling display for content if any -->
-                    {% for error in form.content.errors %}
-                        <div class="text-danger mt-1">{{ error }}</div>
-                    {% endfor %}
+                    <!-- =========================
+                         RIGHT: GRAMMAR CHECKER
+                    ========================== -->
+
+                    <div class="col-lg-4 mb-3">
+
+                        <div class="grammar-sidebar">
+
+                            <h3>Grammar Check</h3>
+
+
+                            <button
+                                type="button"
+                                class="apply-btn"
+                                id="checkGrammarBtn"
+                            >
+                                Check Corrections
+                            </button>
+
+
+                            <div
+                                id="noSuggestionText"
+                                class="no-suggestion"
+                            >
+                                Click "Check Corrections" to check your grammar.
+                            </div>
+
+
+                            <div
+                                id="suggestionCard"
+                                class="suggestion-card"
+                            >
+
+                                <div class="suggestion-text">
+
+                                    <strong>
+                                        Suggested Correction:
+                                    </strong>
+
+                                    <br><br>
+
+                                    <span
+                                        id="suggestedTextDisplay"
+                                    ></span>
+
+                                </div>
+
+
+                                <button
+                                    type="button"
+                                    class="apply-btn"
+                                    id="applyBtn"
+                                >
+                                    Accept All Corrections
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
 
                 </div>
 
-                {{ form.submit(class="btn btn-primary") }}
+
+                {{ form.submit(
+                    class="btn btn-success fw-bold"
+                ) }}
 
             </form>
 
         </div>
+
     </div>
+
 </div>
-<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+
+
+
+<!-- =========================
+     QUILL JS
+========================= -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"
+></script>
+
+
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    
-    const quill = new Quill("#editor", {
-        theme: "snow",
-        modules: {
-            toolbar: {
-                container: "#toolbar",
-                handlers: {
-                    image: imageHandler // Custom image handler function call hoga
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        /* =========================
+           QUILL INITIALIZE
+        ========================= */
+
+        const quill = new Quill(
+            "#editor",
+            {
+                theme: "snow",
+
+                modules: {
+                    toolbar: {
+                        container: "#toolbar",
+
+                        handlers: {
+                            image: imageHandler
+                        }
+                    }
                 }
             }
+        );
+
+
+
+        /* =========================
+           IMAGE UPLOAD
+        ========================= */
+
+        function imageHandler() {
+
+            const input =
+                document.createElement("input");
+
+            input.type = "file";
+
+            input.accept = "image/*";
+
+            input.click();
+
+
+            input.onchange =
+                async () => {
+
+                    const file =
+                        input.files[0];
+
+                    if (!file) return;
+
+
+                    const formData =
+                        new FormData();
+
+                    formData.append(
+                        "image",
+                        file
+                    );
+
+
+                    try {
+
+                        const response =
+                            await fetch(
+                                "/upload-image",
+                                {
+                                    method: "POST",
+                                    body: formData
+                                }
+                            );
+
+
+                        const result =
+                            await response.json();
+
+
+                        if (result.success) {
+
+                            const range =
+                                quill.getSelection();
+
+                            const index =
+                                range
+                                ? range.index
+                                : quill.getLength();
+
+
+                            quill.insertEmbed(
+                                index,
+                                "image",
+                                result.url
+                            );
+
+                        }
+
+                        else {
+
+                            alert(
+                                "Image upload failed: "
+                                + result.message
+                            );
+
+                        }
+
+                    }
+
+                    catch (error) {
+
+                        console.error(error);
+
+                        alert(
+                            "Image upload error!"
+                        );
+
+                    }
+
+                };
+
         }
-    });
 
-    // Custom Image Handler Function
-    function imageHandler() {
-        const input = document.createElement('input');
-        input.setAttribute('type', 'file');
-        input.setAttribute('accept', 'image/*');
-        input.click();
 
-        input.onchange = async () => {
-            const file = input.files[0];
-            if (file) {
-                const formData = new FormData();
-                formData.append('image', file);
+
+        /* =========================
+           FORM VARIABLES
+        ========================= */
+
+        const hiddenInput =
+            document.getElementById(
+                "content"
+            );
+
+        const form =
+            document.getElementById(
+                "postForm"
+            );
+
+
+        /* LOAD OLD CONTENT */
+
+        if (
+            hiddenInput.value.trim() !== ""
+        ) {
+
+            quill.root.innerHTML =
+                hiddenInput.value;
+
+        }
+
+
+
+        /* =========================
+           GRAMMAR VARIABLES
+        ========================= */
+
+        const suggestionCard =
+            document.getElementById(
+                "suggestionCard"
+            );
+
+        const noSuggestionText =
+            document.getElementById(
+                "noSuggestionText"
+            );
+
+        const suggestedTextDisplay =
+            document.getElementById(
+                "suggestedTextDisplay"
+            );
+
+        const applyBtn =
+            document.getElementById(
+                "applyBtn"
+            );
+
+        const checkGrammarBtn =
+            document.getElementById(
+                "checkGrammarBtn"
+            );
+
+
+        let currentSuggestion =
+            "";
+
+
+
+        /* =========================
+           CHECK GRAMMAR
+        ========================= */
+
+        checkGrammarBtn.addEventListener(
+            "click",
+            async () => {
+
+
+                const text =
+                    quill
+                        .getText()
+                        .trim();
+
+
+                /* EMPTY CHECK */
+
+                if (!text) {
+
+                    noSuggestionText.textContent =
+                        "Please write something first.";
+
+                    noSuggestionText.style.display =
+                        "block";
+
+                    suggestionCard.classList.remove(
+                        "active"
+                    );
+
+                    return;
+
+                }
+
+
+                /* LOADING */
+
+                checkGrammarBtn.disabled =
+                    true;
+
+                checkGrammarBtn.textContent =
+                    "Checking...";
+
+                noSuggestionText.textContent =
+                    "Checking grammar...";
+
+                noSuggestionText.style.display =
+                    "block";
+
+                suggestionCard.classList.remove(
+                    "active"
+                );
+
 
                 try {
-                    // Flask ke route par image bhej rahe hain upload hone ke liye
-                    let response = await fetch('/upload-image', {
-                        method: 'POST',
-                        body: formData
-                    });
 
-                    let result = await response.json();
 
-                    if (result.success) {
-                        const range = quill.getSelection();
-                        quill.insertEmbed(range.index, 'image', result.url);
-                    } else {
-                        alert('Image upload failed: ' + result.message);
+                    /* =========================
+                       LANGUAGE TOOL API
+                    ========================= */
+
+                    const response =
+                        await fetch(
+                            "https://api.languagetool.org/v2/check",
+                            {
+                                method: "POST",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/x-www-form-urlencoded"
+                                },
+
+                                body:
+                                    new URLSearchParams({
+                                        text: text,
+                                        language: "en-US"
+                                    })
+                            }
+                        );
+
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            "Grammar API failed"
+                        );
+
                     }
-                } catch (err) {
-                    console.error('Error uploading image:', err);
-                    alert('Image upload error!');
+
+
+                    const data =
+                        await response.json();
+
+
+                    console.log(
+                        "Full API Response:",
+                        data
+                    );
+
+
+                    /* =========================
+                       MULTIPLE CORRECTIONS
+                    ========================= */
+
+                    if (
+                        data.matches &&
+                        data.matches.length > 0
+                    ) {
+
+
+                        /*
+                        Sirf woh matches lo
+                        jinme replacement available hai
+                        */
+
+                        const corrections =
+                            data.matches
+                                .filter(
+                                    match =>
+                                        match.replacements &&
+                                        match.replacements.length > 0
+                                )
+
+                                /*
+                                Descending offset IMPORTANT
+                                */
+
+                                .sort(
+                                    (a, b) =>
+                                        b.offset - a.offset
+                                );
+
+
+                        console.log(
+                            "Total API matches:",
+                            data.matches.length
+                        );
+
+                        console.log(
+                            "Auto corrections:",
+                            corrections
+                        );
+
+
+                        let correctedText =
+                            text;
+
+
+                        /*
+                        Har correction apply karo
+                        right to left
+                        */
+
+                        corrections.forEach(
+                            match => {
+
+
+                                const replacement =
+                                    match
+                                        .replacements[0]
+                                        .value;
+
+
+                                correctedText =
+
+                                    correctedText.slice(
+                                        0,
+                                        match.offset
+                                    )
+
+                                    +
+
+                                    replacement
+
+                                    +
+
+                                    correctedText.slice(
+                                        match.offset
+                                        +
+                                        match.length
+                                    );
+
+
+                            }
+                        );
+
+
+                        console.log(
+                            "Original Text:",
+                            text
+                        );
+
+                        console.log(
+                            "Corrected Text:",
+                            correctedText
+                        );
+
+
+                        /* =========================
+                           SHOW CORRECTION
+                        ========================= */
+
+                        if (
+                            correctedText !== text
+                        ) {
+
+
+                            currentSuggestion =
+                                correctedText;
+
+
+                            suggestedTextDisplay.textContent =
+                                correctedText;
+
+
+                            suggestionCard.classList.add(
+                                "active"
+                            );
+
+
+                            noSuggestionText.style.display =
+                                "none";
+
+
+                        }
+
+                        else {
+
+
+                            currentSuggestion =
+                                "";
+
+
+                            suggestionCard.classList.remove(
+                                "active"
+                            );
+
+
+                            noSuggestionText.textContent =
+                                "Grammar issues found, but no automatic correction is available.";
+
+
+                            noSuggestionText.style.display =
+                                "block";
+
+
+                        }
+
+
+                    }
+
+
+                    /* =========================
+                       NO ERRORS
+                    ========================= */
+
+                    else {
+
+
+                        currentSuggestion =
+                            "";
+
+
+                        suggestionCard.classList.remove(
+                            "active"
+                        );
+
+
+                        noSuggestionText.textContent =
+                            "Everything looks good! No grammar errors found.";
+
+
+                        noSuggestionText.style.display =
+                            "block";
+
+
+                    }
+
+
                 }
+
+
+                /* =========================
+                   API ERROR
+                ========================= */
+
+                catch (error) {
+
+
+                    console.error(
+                        "Grammar Error:",
+                        error
+                    );
+
+
+                    currentSuggestion =
+                        "";
+
+
+                    suggestionCard.classList.remove(
+                        "active"
+                    );
+
+
+                    noSuggestionText.textContent =
+                        "Grammar API error. Please try again.";
+
+
+                    noSuggestionText.style.display =
+                        "block";
+
+
+                }
+
+
+                /* =========================
+                   RESET BUTTON
+                ========================= */
+
+                finally {
+
+
+                    checkGrammarBtn.disabled =
+                        false;
+
+
+                    checkGrammarBtn.textContent =
+                        "Check Corrections";
+
+
+                }
+
+
             }
-        };
+        );
+
+
+
+        /* =========================
+           ACCEPT ALL CORRECTIONS
+        ========================= */
+
+        applyBtn.addEventListener(
+            "click",
+            () => {
+
+
+                if (
+                    !currentSuggestion
+                ) return;
+
+
+                /*
+                IMPORTANT:
+                setText plain text use karta hai.
+                Isliye grammar apply hone par
+                formatting reset ho sakti hai.
+                */
+
+                quill.setText(
+                    currentSuggestion
+                );
+
+
+                suggestionCard.classList.remove(
+                    "active"
+                );
+
+
+                noSuggestionText.textContent =
+                    "All corrections applied successfully!";
+
+
+                noSuggestionText.style.display =
+                    "block";
+
+
+                currentSuggestion =
+                    "";
+
+
+            }
+        );
+
+
+
+        /* =========================
+           FORM SUBMIT
+        ========================= */
+
+        form.addEventListener(
+            "submit",
+            function () {
+
+
+                let htmlContent =
+                    quill.root.innerHTML;
+
+
+                if (
+                    quill.getText().trim() === ""
+                    &&
+                    !htmlContent.includes("<img")
+                ) {
+
+                    htmlContent = "";
+
+                }
+
+
+                hiddenInput.value =
+                    htmlContent;
+
+
+            }
+        );
+
+
     }
+);
 
-    const hiddenInput = document.getElementById("content");
-    const form = document.getElementById("postForm");
-
-    // Agar purana data hai (jaise edit page me), toh usko load karein
-    if (hiddenInput.value.trim() !== "") {
-        quill.root.innerHTML = hiddenInput.value;
-    }
-
-    // Form submit hone se theek pehle Quill ka HTML hidden input me daalo
-    form.addEventListener("submit", function (e) {
-        let htmlContent = quill.root.innerHTML;
-        
-        if (quill.getText().trim() === "" && htmlContent.includes('<img') === false) {
-            htmlContent = "";
-        }
-        
-        hiddenInput.value = htmlContent;
-    });
-
-});
 </script>
 
 {% endblock %}
