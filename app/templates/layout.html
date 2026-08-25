@@ -48,6 +48,7 @@
             --border-color: #dee2e6;
             --input-bg: #ffffff;
             --input-text: #212529;
+            --footer-bg: #ffffff;
         }
 
         /* --- VS Code Dark Theme (HTML tag target) --- */
@@ -59,6 +60,7 @@
             --border-color: #333333;   /* Subtle border color */
             --input-bg: #2d2d2d;       /* Input box dark shade */
             --input-text: #ffffff;     /* Input typing text */
+            --footer-bg: #181818;      /* Footer dark shade matching navbar */
         }
 
         /* --- Global Application to All Elements --- */
@@ -66,6 +68,13 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             transition: background-color 0.25s ease, color 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container.mt-4 {
+            flex: 1;
         }
 
         /* Navbar fix */
@@ -98,6 +107,49 @@
         html.dark-mode input::placeholder, 
         html.dark-mode textarea::placeholder {
             color: #858585 !important;
+        }
+
+        /* --- Footer Styling --- */
+        .site-footer {
+            background-color: var(--footer-bg);
+            border-top: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 35px 0 20px 0;
+            margin-top: 50px;
+            transition: background-color 0.25s ease, border-color 0.25s ease;
+        }
+        .site-footer h5 {
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        .site-footer ul li a {
+            color: var(--text-color);
+            opacity: 0.8;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+        .site-footer ul li a:hover {
+            opacity: 1;
+            color: #007bff;
+            text-decoration: underline;
+        }
+        .social-icons a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(0, 123, 255, 0.1);
+            color: #007bff;
+            margin-right: 8px;
+            transition: all 0.3s;
+        }
+        .social-icons a:hover {
+            background: #007bff;
+            color: #ffffff;
+            transform: translateY(-2px);
         }
     </style>
 </head>
@@ -136,7 +188,7 @@
           <a class="dropdown-item" href="/contact">Contact Us </a>
           <a class="dropdown-item" href="/account">View profile</a>
           <div class="dropdown-divider"></div>
-          <a class="dropdown-item" href="https://h-24-gn7z.onrender.com/" target="_blank">H-24</a>
+          <a class="dropdown-item" href="https://h-24-gn7z.onrender.com/" target="_blank">H-24 Portal</a>
         </div>
       </li>
       <li class="nav-item">
@@ -249,6 +301,57 @@
         <i class="fa-solid fa-plus"></i>
     </a>
 {% endif %}
+
+<!-- ================= Footer Section ================= -->
+<footer class="site-footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <h5><i class="fa-solid fa-shield-halved text-primary mr-2"></i>H-24 Blog</h5>
+                <p class="small text-muted">
+                    A dedicated platform built for tech enthusiasts, exploring cybersecurity, ethical hacking, Python automation, and web development.
+                </p>
+            </div>
+            <div class="col-md-2 col-6 mb-3">
+                <h5>Quick Links</h5>
+                <ul class="list-unstyled small">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/about">About Us</a></li>
+                    <li><a href="/supportus">Support Us</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3 col-6 mb-3">
+                <h5>Categories</h5>
+                <ul class="list-unstyled small">
+                    <li><a href="#">Cyber Security</a></li>
+                    <li><a href="#">Python Programming</a></li>
+                    <li><a href="#">Flask & Web Dev</a></li>
+                    <li><a href="#">CTF Writeups</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3 mb-3">
+                <h5>Connect With Us</h5>
+                <div class="social-icons mb-2">
+                    <a href="https://github.com/prajapatiHardik2008" target="_blank" title="GitHub"><i class="fa-brands fa-github"></i></a>
+                    <a href="https://www.instagram.com/prajapati__hardik__24/" target="_blank" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://www.linkedin.com/in/hardik-prajapati-475231390/" target="_blank" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                    <a href="https://telegram.org" target="_blank" title="Telegram"><i class="fa-brands fa-telegram"></i></a>
+                </div>
+                <p class="small text-muted mb-0">Stay secure, keep coding!</p>
+            </div>
+        </div>
+        <hr class="border-secondary opacity-25 my-3">
+        <div class="row align-items-center">
+            <div class="col-md-6 text-center text-md-left small text-muted">
+                &copy; 2026 <strong>H-24 Blog</strong>. All rights reserved. Built with Flask.
+            </div>
+            <div class="col-md-6 text-center text-md-right small text-muted">
+                Designed & Managed by Hardik Prajapati
+            </div>
+        </div>
+    </div>
+</footer>
 
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>

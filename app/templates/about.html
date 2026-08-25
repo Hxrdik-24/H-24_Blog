@@ -1,260 +1,261 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<div class="container py-5">
+<!-- Custom Styling & Animations for this Profile Page -->
+<style>
+    /* Profile Hero Glow & Floating Animation */
+    .profile-hero {
+        background: linear-gradient(135deg, rgba(0, 123, 255, 0.1), rgba(111, 66, 193, 0.1));
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(0, 123, 255, 0.2) !important;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .profile-hero::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(0,123,255,0.05) 0%, transparent 70%);
+        animation: rotateGlow 15s linear infinite;
+        z-index: 0;
+    }
 
-    <!-- Hero -->
-    <div class="card shadow border-0 mb-5">
-        <div class="card-body text-center p-5">
+    @keyframes rotateGlow {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
 
-            <h1 class="fw-bold">Hi, I'm Hardik 👋</h1>
+    .profile-content {
+        position: relative;
+        z-index: 1;
+    }
 
-            <p class="lead text-muted">
-                BCA Student • Python Developer • Flask Developer • Android Developer
+    /* Floating Emoji / Badge Animation */
+    .floating-badge {
+        display: inline-block;
+        animation: floatAnim 3s ease-in-out infinite;
+    }
+
+    @keyframes floatAnim {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+    }
+
+    /* Interactive Cards Hover Polish */
+    .hover-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        border: 1px solid var(--border-color) !important;
+    }
+    .hover-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 25px rgba(0, 123, 255, 0.15) !important;
+        border-color: #007bff !important;
+    }
+
+    /* Skill Badge Styling */
+    .skill-badge {
+        transition: all 0.2s ease;
+        cursor: default;
+    }
+    .skill-badge:hover {
+        transform: scale(1.1);
+        filter: brightness(1.15);
+    }
+
+    /* Contact Links Modern Styling */
+    .contact-link-item {
+        transition: all 0.2s ease;
+        border-radius: 8px;
+        padding: 8px;
+    }
+    .contact-link-item:hover {
+        background-color: rgba(0, 123, 255, 0.08);
+        transform: translateX(5px);
+    }
+</style>
+
+<div class="container py-4">
+
+    <!-- Hero Section with Animated Background & Floating Emoji -->
+    <div class="card profile-hero shadow-lg border-0 mb-5 rounded-lg">
+        <div class="card-body text-center p-5 profile-content">
+            <span class="floating-badge display-4 mb-2">⚡</span>
+            <h1 class="fw-bold display-5">Hi, I'm <span class="text-primary">Hardik</span></h1>
+
+            <p class="lead text-muted font-weight-bold">
+                BCA Student &bull; Python Developer &bull; Flask Developer &bull; Android Developer
             </p>
 
-            <p class="mt-3">
-                Passionate about building secure web applications, Android apps,
-                and continuously learning Cyber Security.
+            <p class="mt-3 text-secondary mx-auto" style="max-width: 600px;">
+                Passionate about building secure web applications, Android apps, 
+                and continuously exploring the depths of Cyber Security & CTF challenges.
             </p>
 
-            <a href="mailto:hardikprajapati242008@gmail.com"
-               class="btn btn-primary me-2">
-                Contact Me
-            </a>
-
-            <a href="#projects"
-               class="btn btn-outline-primary">
-                View Projects
-            </a>
-
+            <div class="mt-4">
+                <a href="mailto:hardikprajapati242008@gmail.com" class="btn btn-primary px-4 py-2 mr-2 shadow-sm">
+                    <i class="fa-solid fa-envelope mr-1"></i> Contact Me
+                </a>
+                <a href="#projects" class="btn btn-outline-primary px-4 py-2 shadow-sm">
+                    <i class="fa-solid fa-code mr-1"></i> View Projects
+                </a>
+            </div>
         </div>
     </div>
 
-    <!-- About -->
-
-    <div class="card shadow-sm mb-5">
-        <div class="card-body">
-
-            <h2 class="mb-3">
-                About Me
+    <!-- About Me Section -->
+    <div class="card hover-card shadow-sm mb-5 rounded-lg">
+        <div class="card-body p-4">
+            <h2 class="h4 mb-3 text-primary font-weight-bold">
+                <i class="fa-solid fa-user-shield mr-2"></i> About Me
             </h2>
-
             <p>
-                Hello! I'm <strong>Hardik</strong>, a BCA student who loves
-                creating modern web applications and Android apps.
-                My favorite programming language is Python, and I enjoy working
-                with Flask to build secure and user-friendly applications.
+                Hello! I'm <strong>Hardik</strong>, a dedicated BCA student who loves 
+                creating modern web applications and Android apps. 
+                My primary weapon of choice is Python, and I heavily rely on Flask 
+                to architect clean, secure, and user-friendly web utilities.
             </p>
-
-            <p>
-                Besides development, I actively learn Cyber Security,
-                Ethical Hacking, Networking, and Digital Forensics through
-                practical projects and CTF challenges.
+            <p class="mb-0">
+                Beyond standard software development, I actively immerse myself in 
+                Cyber Security, Ethical Hacking, Network Protocols, and Digital Forensics 
+                through practical execution and competitive platforms.
             </p>
-
         </div>
     </div>
 
-    <!-- Skills -->
-
-    <div class="card shadow-sm mb-5">
-
-        <div class="card-body">
-
-            <h2 class="mb-4">
-                My Skills
+    <!-- Skills Section -->
+    <div class="card hover-card shadow-sm mb-5 rounded-lg">
+        <div class="card-body p-4">
+            <h2 class="h4 mb-4 text-primary font-weight-bold">
+                <i class="fa-solid fa-laptop-code mr-2"></i> Tech Stack & Skills
             </h2>
-
-            <span class="badge bg-primary p-2 m-1">Python</span>
-            <span class="badge bg-success p-2 m-1">Flask</span>
-            <span class="badge bg-danger p-2 m-1">Java</span>
-            <span class="badge bg-warning text-dark p-2 m-1">JavaScript</span>
-            <span class="badge bg-info text-dark p-2 m-1">HTML</span>
-            <span class="badge bg-secondary p-2 m-1">CSS</span>
-            <span class="badge bg-light p-2 m-1">Bootstrap 5</span>
-            <span class="badge bg-primary p-2 m-1">Android Development</span>
-            <span class="badge bg-success p-2 m-1">SQLAlchemy</span>
-            <span class="badge bg-danger p-2 m-1">Git</span>
-            <span class="badge bg-warning text-dark p-2 m-1">GitHub</span>
-            <span class="badge bg-info text-dark p-2 m-1">Linux</span>
-
+            <div class="d-flex flex-wrap">
+                <span class="badge badge-primary p-2 m-1 skill-badge">Python</span>
+                <span class="badge badge-success p-2 m-1 skill-badge">Flask</span>
+                <span class="badge badge-danger p-2 m-1 skill-badge">Java</span>
+                <span class="badge badge-warning text-dark p-2 m-1 skill-badge">JavaScript</span>
+                <span class="badge badge-info text-dark p-2 m-1 skill-badge">HTML5</span>
+                <span class="badge badge-secondary p-2 m-1 skill-badge">CSS3</span>
+                <span class="badge badge-dark p-2 m-1 skill-badge">Bootstrap 5</span>
+                <span class="badge badge-primary p-2 m-1 skill-badge">Android Development</span>
+                <span class="badge badge-success p-2 m-1 skill-badge">SQLAlchemy</span>
+                <span class="badge badge-danger p-2 m-1 skill-badge">Git & GitHub</span>
+                <span class="badge badge-info text-dark p-2 m-1 skill-badge">Linux Operations</span>
+                <span class="badge badge-dark p-2 m-1 skill-badge">Cyber Security</span>
+            </div>
         </div>
-
     </div>
 
-    <!-- Projects -->
-
+    <!-- Projects Section -->
     <div id="projects" class="mb-5">
-
-        <h2 class="mb-4">
-            Featured Projects
+        <h2 class="h4 mb-4 font-weight-bold">
+            <i class="fa-solid fa-rocket text-primary mr-2"></i> Featured Projects
         </h2>
 
         <div class="row g-4">
-
-            <div class="col-md-4">
-
-                <div class="card h-100 shadow-sm">
-
-                    <div class="card-body">
-
-                        <h4>
-                            H-24 Blog
+            <div class="col-md-4 mb-3">
+                <div class="card hover-card h-100 shadow-sm border-0">
+                    <div class="card-body d-flex flex-column">
+                        <h4 class="h5 font-weight-bold text-primary">
+                            <i class="fa-solid fa-blog mr-2"></i>H-24 Blog
                         </h4>
-
-                        <p>
-                            A Flask-based blogging platform with authentication,
-                            user profiles, secure login, post management,
-                            and responsive design.
+                        <p class="text-muted small flex-grow-1 mt-2">
+                            A dynamic Flask-based blogging platform featuring authentication, user profiles, secure session handling, custom themes, and post management systems.
                         </p>
-
                     </div>
-
                 </div>
-
             </div>
 
-            <div class="col-md-4">
-
-                <div class="card h-100 shadow-sm">
-
-                    <div class="card-body">
-
-                        <h4>
-                            Nexa AI
+            <div class="col-md-4 mb-3">
+                <div class="card hover-card h-100 shadow-sm border-0">
+                    <div class="card-body d-flex flex-column">
+                        <h4 class="h5 font-weight-bold text-success">
+                            <i class="fa-solid fa-microphone-lines mr-2"></i>Nexa AI
                         </h4>
-
-                        <p>
-                            A Python voice assistant capable of automation,
-                            voice commands, and AI integration.
+                        <p class="text-muted small flex-grow-1 mt-2">
+                            An intelligent Python voice assistant engineered for OS automation, custom vocal commands execution, and lightweight machine learning integrations.
                         </p>
-
                     </div>
-
                 </div>
-
             </div>
 
-            <div class="col-md-4">
-
-                <div class="card h-100 shadow-sm">
-
-                    <div class="card-body">
-
-                        <h4>
-                            Cyber Security Tools
+            <div class="col-md-4 mb-3">
+                <div class="card hover-card h-100 shadow-sm border-0">
+                    <div class="card-body d-flex flex-column">
+                        <h4 class="h5 font-weight-bold text-danger">
+                            <i class="fa-solid fa-shield-cat mr-2"></i>Cyber Security Tools
                         </h4>
-
-                        <p>
-                            Developed multiple Python-based security tools
-                            including scanners, forensic utilities,
-                            and automation scripts.
+                        <p class="text-muted small flex-grow-1 mt-2">
+                            A repository of custom Python-powered security scripts built for network reconnaissance, forensic data utilities, and CTF challenge automations.
                         </p>
-
                     </div>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
 
-    <!-- Freelance -->
-
-    <div class="card border-primary shadow mb-5">
-
-        <div class="card-body text-center">
-
-            <h2 class="text-primary">
-                💼 Freelance Services
+    <!-- Freelance Section -->
+    <div class="card hover-card border-primary shadow mb-5 rounded-lg">
+        <div class="card-body text-center p-4">
+            <h2 class="h4 text-primary font-weight-bold">
+                <i class="fa-solid fa-briefcase mr-2"></i> Freelance Services
             </h2>
-
-            <p class="mt-3">
-                Need a website or Android application?
-                I also work on freelance projects.
+            <p class="text-muted mt-2">
+                Need a secure website, custom utility, or Android application built from scratch? I am open to selective freelance projects.
             </p>
 
-            <div class="row text-start mt-4">
-
-                <div class="col-md-6">
-
-                    <ul>
-
-                        <li>Custom Website Development</li>
-                        <li>Android App Development</li>
-                        <li>Portfolio Websites</li>
-
+            <div class="row text-left mt-4 justify-content-center">
+                <div class="col-md-5">
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fa-solid fa-check text-success mr-2"></i>Custom Website Development</li>
+                        <li class="mb-2"><i class="fa-solid fa-check text-success mr-2"></i>Android App Development</li>
+                        <li class="mb-2"><i class="fa-solid fa-check text-success mr-2"></i>Portfolio & Blog Platforms</li>
                     </ul>
-
                 </div>
-
-                <div class="col-md-6">
-
-                    <ul>
-
-                        <li>Bug Fixes</li>
-                        <li>Authentication Systems</li>
-                        <li>Deployment & Maintenance</li>
-
+                <div class="col-md-5">
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fa-solid fa-check text-success mr-2"></i>Bug Fixes & Code Optimization</li>
+                        <li class="mb-2"><i class="fa-solid fa-check text-success mr-2"></i>Secure Authentication Systems</li>
+                        <li class="mb-2"><i class="fa-solid fa-check text-success mr-2"></i>Deployment & Cloud Setup</li>
                     </ul>
-
                 </div>
-
             </div>
 
-            <a href="mailto:hardikprajapati242008@gmail.com"
-               class="btn btn-primary mt-3">
-                Hire Me
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSe-tjKE7Qu5XqqCfDmecF_rqjoxH0qc5u57Xycv38nQL6WSYQ/viewform?usp=publish-editor" class="btn btn-primary mt-3 px-4 shadow-sm">
+                <i class="fa-solid fa-paper-plane mr-1"></i> Hire Me Now
             </a>
-
         </div>
-
     </div>
 
-    <!-- Contact -->
-
-    <div class="card shadow-sm">
-
-        <div class="card-body text-center">
-
-            <h2>
-                Contact
+    <!-- Contact Details Section -->
+    <div class="card hover-card shadow-sm rounded-lg">
+        <div class="card-body text-center p-4">
+            <h2 class="h4 font-weight-bold">
+                <i class="fa-solid id-card mr-2"></i> Get In Touch
             </h2>
+            <hr class="w-25 mx-auto">
 
-            <hr>
-
-            <p>
-                📷 Instagram :
-                <strong>@prajapati__hardik__24</strong>
-            </p>
-
-            <p>
-                📧 Email :
-                <strong>hardikprajapati242008@gmail.com</strong>
-            </p>
-
-            <p>
-                💻 GitHub :
-                <strong>github.com/prajapatiHardik2008</strong>
-            </p>
-
+            <div class="d-flex flex-column align-items-center justify-content-center mt-3">
+                <div class="contact-link-item mb-2">
+                    <a href="https://instagram.com/prajapati__hardik__24" target="_blank" class="text-decoration-none text-body">
+                        <i class="fa-brands fa-instagram text-danger fa-lg mr-2"></i> Instagram: <strong>@prajapati__hardik__24</strong>
+                    </a>
+                </div>
+                <div class="contact-link-item mb-2">
+                    <a href="mailto:hardikprajapati242008@gmail.com" class="text-decoration-none text-body">
+                        <i class="fa-solid fa-envelope text-primary fa-lg mr-2"></i> Email: <strong>hardikprajapati242008@gmail.com</strong>
+                    </a>
+                </div>
+                <div class="contact-link-item mb-2">
+                    <a href="https://github.com/prajapatiHardik2008" target="_blank" class="text-decoration-none text-body">
+                        <i class="fa-brands fa-github text-dark fa-lg mr-2"></i> GitHub: <strong>github.com/prajapatiHardik2008</strong>
+                    </a>
+                </div>
+            </div>
         </div>
-
-    </div>
-
-    <!-- Footer -->
-
-    <div class="text-center mt-5 text-muted">
-
-        <small>
-
-            Built with ❤️ by Hardik • Open for Web & Android Freelance Projects
-
-        </small>
-
     </div>
 
 </div>
