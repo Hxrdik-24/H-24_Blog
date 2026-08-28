@@ -208,12 +208,12 @@ def register():
             return redirect(url_for("login"))
             
         except Exception as e:
-            db.session.rollback()  # Database rollback agar error aaye
+            db.session.rollback()  
             print(f"Database/Registration Error: {e}")
             flash(f"Error: {e}", "danger")
             
     elif request.method == "POST":
-        # Yeh print batayega ki WTForms ne form ko kyu reject kiya
+        
         print("Form Errors:", form.errors)
         flash("Something went wrong while creating your account. Check form fields.", "danger")
  
@@ -241,7 +241,7 @@ def save_img(form_img):
 def upload_image():
 
     MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB
-    MIN_FREE_STORAGE = 200 * 1024 * 1024  # 200 MB
+    #MIN_FREE_STORAGE = 200 * 1024 * 1024  # 200 MB
 
     if 'image' not in request.files:
         return jsonify({
