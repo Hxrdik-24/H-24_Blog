@@ -422,6 +422,9 @@ def Twofa():
 def sup():
     return render_template('supportus.html')
 
+@app.route('/helth')
+def helth():
+    return "OK" , 200
 # @app.route('/google7c80791f63896477.html')
 # def google_verification():
 #     return  send_from_directory('.', 'google7c80791f63896477.html')

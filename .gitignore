@@ -4,6 +4,7 @@ env/
 .env
 # Python Compiled Files
 test.py
+dummy.py
 autopush.py
 __pycache__/
 *.pyc
