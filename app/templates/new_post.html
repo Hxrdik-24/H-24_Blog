@@ -167,7 +167,7 @@
                     ) }}
 
                 </div>
-
+                
 
                 <div class="row">
 
@@ -329,7 +329,18 @@
                         {% endfor %}
 
                     </div>
+                    
+                <!-- TITLE -->
 
+                    <div class="mb-3">
+
+                        {{ form.tag.label(class="form-label text-light") }}
+
+                        {{ form.tag(
+                            class="form-control bg-secondary text-light border-0"
+                        ) }}
+
+                    </div>
 
                     <!-- =========================
                          RIGHT: GRAMMAR CHECKER

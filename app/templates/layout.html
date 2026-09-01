@@ -7,18 +7,17 @@
     <meta name="keywords" content="@Prajapati__Hardik__24,Hardik Prajapati, Hardik H-24, H-24 Blog, cybersecurity, ethical hacking, Python programming, CTF writeups, BCA student, web development, LJKU">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">    
     
     <title>
         {% if title %}
             {{title}}
         {% else  %}
-            Flask BLog app
+            Flask Blog app
         {% endif %}
     </title>
     
-    <!-- 1. Page load hone se pehle HTML tag par theme lagana (Blink rokne ke liye) -->
     <script>
         if (localStorage.getItem('theme') === 'dark') {
             document.documentElement.classList.add('dark-mode');
@@ -28,18 +27,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     
     <style>
-        .btn-insta-plus {
-            width: 38px;
-            height: 38px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            padding: 0;
-            font-size: 1.1rem;
-        }
-
-        /* --- Light Theme (Default) --- */
+        /* --- Theme Variables --- */
         :root {
             --bg-color: #f8f9fa;
             --text-color: #212529;
@@ -48,22 +36,36 @@
             --border-color: #dee2e6;
             --input-bg: #ffffff;
             --input-text: #212529;
-            --footer-bg: #ffffff;
+            --loader-bg: #f8f9fa;
+            
+            /* Light Mode Footer: Night Sky */
+            --footer-bg-gradient: linear-gradient(#111827, #1f2937, #374151, #0b1329);
+            --footer-text: #d4d4d4;
+            --footer-muted: #94a3b8;
+            --footer-link: #60a5fa;
+            --celestial-icon: "🌙";
+            --star-display: block;
         }
 
-        /* --- VS Code Dark Theme (HTML tag target) --- */
         html.dark-mode {
-            --bg-color: #1e1e1e;      /* VS Code main background */
-            --text-color: #d4d4d4;     /* VS Code standard text color */
-            --card-bg: #252526;        /* VS Code sidebar/card background */
-            --nav-bg: #181818;         /* VS Code titlebar / top navbar style */
-            --border-color: #333333;   /* Subtle border color */
-            --input-bg: #2d2d2d;       /* Input box dark shade */
-            --input-text: #ffffff;     /* Input typing text */
-            --footer-bg: #181818;      /* Footer dark shade matching navbar */
+            --bg-color: #1e1e1e;
+            --text-color: #d4d4d4;
+            --card-bg: #252526;
+            --nav-bg: #181818;
+            --border-color: #333333;
+            --input-bg: #2d2d2d;
+            --input-text: #ffffff;
+            --loader-bg: #1e1e1e;
+            
+            /* Dark Mode Footer: Day Sky */
+            --footer-bg-gradient: linear-gradient(#38bdf8, #7dd3fc, #bae6fd, #e0f2fe);
+            --footer-text: #0f172a;
+            --footer-muted: #334155;
+            --footer-link: #1d4ed8;
+            --celestial-icon: "☀️";
+            --star-display: none; /* Hide stars in day mode */
         }
 
-        /* --- Global Application to All Elements --- */
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
@@ -77,7 +79,7 @@
             flex: 1;
         }
 
-        /* Navbar fix */
+        /* Navbar Styling */
         nav, .navbar {
             background-color: var(--nav-bg) !important;
             border-bottom: 1px solid var(--border-color);
@@ -88,14 +90,14 @@
             color: var(--text-color) !important;
         }
 
-        /* Cards fix */
+        /* Cards Styling */
         .card, .container-box {
             background-color: var(--card-bg) !important;
             border-color: var(--border-color) !important;
             color: var(--text-color) !important;
         }
 
-        /* Inputs, Textareas, aur Forms fix */
+        /* Inputs Fix */
         html.dark-mode input, 
         html.dark-mode textarea, 
         html.dark-mode select {
@@ -109,30 +111,217 @@
             color: #858585 !important;
         }
 
-        /* --- Footer Styling --- */
+        /* --- Footer Sky Animation & Cloud Engine --- */
         .site-footer {
-            background-color: var(--footer-bg);
-            border-top: 1px solid var(--border-color);
-            color: var(--text-color);
-            padding: 35px 0 20px 0;
-            margin-top: 50px;
-            transition: background-color 0.25s ease, border-color 0.25s ease;
+            background: var(--footer-bg-gradient);
+            color: var(--footer-text);
+            padding: 60px 0 25px 0;
+            margin-top: 60px;
+            position: relative;
+            overflow: hidden;
+            transition: background 0.5s ease, color 0.4s ease;
         }
+
+        /* Celestial Emoji (Moon / Sun) */
+        .footer-celestial {
+            position: absolute;
+            top: 20px;
+            right: 10%;
+            font-size: 2.5rem;
+            z-index: 2;
+            user-select: none;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.4));
+        }
+        .footer-celestial::before {
+            content: var(--celestial-icon);
+        }
+
+        /* Cloud Pane container inside Footer */
+        .cloudPane {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 180px;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Stars visibility toggle */
+        .stars {
+            display: var(--star-display);
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Exact Loading.io Cloud Styles & Components */
+        .bigCloud {
+            position: absolute;
+        }
+        .smallCircle {
+            height: 70px;
+            width: 70px;
+            background: white;
+            border-radius: 100%;
+            position: absolute;
+            opacity: 0.85;
+        }
+        .middleCircle {
+            height: 110px;
+            width: 110px;
+            background: white;
+            border-radius: 100%;
+            position: absolute;
+            opacity: 0.85;
+        }
+        .largeCircle {
+            height: 140px;
+            width: 140px;
+            background: white;
+            border-radius: 100%;
+            position: absolute;
+            opacity: 0.85;
+        }
+
+        /* Circle Shadows for 3D Vector Look */
+        #circ1shadow, #circ2shadow, #circ3shadow, #circ5shadow, #circ6shadow {
+            background-repeat: no-repeat;
+            position: absolute;
+            z-index: 2;
+            transform: scale(0.9, -0.9);
+        }
+        #circ1shadow {
+            background: radial-gradient(circle, rgba(204, 0, 0, 0) 90px, rgba(0, 0, 0, 0.15) 40px);
+            top: 2px;
+        }
+        #circ2shadow {
+            background: radial-gradient(circle, rgba(204, 0, 0, 0) 70px, rgba(0, 0, 0, 0.15) 40px);
+            top: 0px;
+        }
+        #circ3shadow {
+            background: radial-gradient(circle, rgba(204, 0, 0, 0) 65px, rgba(0, 0, 0, 0.15) 35px);
+            top: 4px;
+        }
+        #circ5shadow, #circ6shadow {
+            background: radial-gradient(circle, rgba(204, 0, 0, 0) 45px, rgba(0, 0, 0, 0.15) 25px);
+            top: 0px;
+        }
+
+        /* Individual Circle Positions inside Clouds */
+        #circ1 { z-index: 1; }
+        #circ2 { top: 35px; left: -30px; }
+        #circ3 { top: 35px; left: -90px; }
+        #circ4 { top: 20px; left: -45px; }
+        #circ5 { top: 70px; left: -110px; }
+        #circ6 { top: 70px; left: 90px; }
+
+        /* Cloud Positions & Slow Drifting Animations */
+        #cloud1 {
+            top: 40px;
+            left: 120%;
+            transform: scale(1.1);
+            animation: drift 45s linear infinite;
+            animation-delay: 2s;
+            z-index: 3;
+        }
+        #cloud2 {
+            top: 60px;
+            left: 120%;
+            transform: scale(0.7);
+            animation: drift 70s linear infinite;
+            animation-delay: 10s;
+            z-index: 2;
+        }
+        #cloud3 {
+            top: 20px;
+            left: 50%;
+            opacity: 0;
+            transform: scale(0.5);
+            animation: driftBg 85s linear infinite;
+            z-index: 1;
+        }
+        #cloud4 {
+            top: 40px;
+            left: 20%;
+            opacity: 0;
+            transform: scale(0.55);
+            animation: driftBg2 75s linear infinite;
+            z-index: 1;
+        }
+        #cloud6 {
+            top: 50px;
+            left: 120%;
+            transform: scale(0.5);
+            animation: drift 100s linear infinite;
+            animation-delay: 5s;
+            z-index: 1;
+        }
+        #cloud7 {
+            top: 75px;
+            left: 120%;
+            transform: scale(0.65);
+            animation: drift 55s linear infinite;
+            animation-delay: 20s;
+            z-index: 2;
+        }
+
+        /* Stars Styling */
+        .star {
+            height: 2px;
+            width: 2px;
+            background: white;
+            position: absolute;
+            box-shadow: 0 0 4px #fff;
+        }
+        #star1 { top: 15px; left: 15%; }
+        #star2 { top: 40px; left: 35%Data; }
+        #star3 { top: 25px; left: 65%; }
+        #star4 { top: 50px; left: 85%; }
+        #star5 { top: 10px; left: 90%; }
+        #star6 { top: 60px; left: 25%; height: 3px; width: 3px; }
+        #star7 { top: 30px; left: 45%; }
+
+        /* Keyframes for Smooth & Slow Drifting */
+        @keyframes drift {
+            from { left: 120%; }
+            to { left: -30%; }
+        }
+        @keyframes driftBg {
+            0% { left: 50%; opacity: 0; }
+            5% { opacity: 0.7; }
+            100% { left: -30%; opacity: 0.7; }
+        }
+        @keyframes driftBg2 {
+            0% { left: 20%; opacity: 0; }
+            5% { opacity: 0.7; }
+            100% { left: -30%; opacity: 0.7; }
+        }
+
+        /* Footer content stacking above cloud pane */
+        .site-footer .container {
+            position: relative;
+            z-index: 3;
+        }
+
         .site-footer h5 {
             font-weight: 600;
             margin-bottom: 15px;
             font-size: 1.1rem;
+            color: var(--footer-text);
         }
         .site-footer ul li a {
-            color: var(--text-color);
-            opacity: 0.8;
+            color: var(--footer-muted);
             text-decoration: none;
-            transition: opacity 0.2s;
+            transition: color 0.2s;
         }
         .site-footer ul li a:hover {
-            opacity: 1;
-            color: #007bff;
+            color: var(--footer-link);
             text-decoration: underline;
+        }
+        .site-footer p, .site-footer .text-muted {
+            color: var(--footer-muted) !important;
         }
         .social-icons a {
             display: inline-flex;
@@ -141,29 +330,69 @@
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            background: rgba(0, 123, 255, 0.1);
-            color: #007bff;
+            background: rgba(255, 255, 255, 0.15);
+            color: var(--footer-link);
             margin-right: 8px;
             transition: all 0.3s;
         }
         .social-icons a:hover {
-            background: #007bff;
+            background: var(--footer-link);
             color: #ffffff;
             transform: translateY(-2px);
         }
+
+        /* --- Loading Animation Styles --- */
+        #page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--loader-bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+        .loader-box { text-align: center; }
+        .h24-spinner {
+            width: 55px;
+            height: 55px;
+            border: 4px solid rgba(0, 123, 255, 0.2);
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 15px auto;
+        }
+        .loader-text {
+            font-family: monospace;
+            font-weight: 600;
+            letter-spacing: 2px;
+            color: var(--text-color);
+            font-size: 1.1rem;
+            animation: pulse 1.2s ease-in-out infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+        .fade-out { opacity: 0; visibility: hidden; }
     </style>
 </head>
 <body>
 
+<div id="page-loader">
+    <div class="loader-box">
+        <div class="h24-spinner"></div>
+        <div class="loader-text">&lt; H-24 LOADING /&gt;</div>
+    </div>
+</div>
+
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <a class="navbar-brand" href="/">
-    <img src="{{ url_for('static', filename='images/H-24 Blog.png') }}" 
-         alt="Logo" 
-         width="30" 
-         height="30" 
-         class="d-inline-block align-top">
+    <img src="{{ url_for('static', filename='images/H-24 Blog.png') }}" alt="Logo" width="30" height="30" class="d-inline-block align-top">
     H-24 Blog
-</a>
+  </a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -176,7 +405,6 @@
       <li class="nav-item">
         <a class="nav-link" href="/about">About us</a>
       </li>
-      
       <li class="nav-item">
         <a class="nav-link" href="/supportus">Support us</a>
       </li>
@@ -198,61 +426,45 @@
     
     <form class="form-inline my-2 my-lg-0" action="/searchuser" method="post">
         <input class="form-control mr-sm-2" type="search" placeholder="Search profile " aria-label="Search" name="userName">
-        <button class="btn btn-outline-success my-2 my-sm-0  mx-2" type="submit">Search</button>
+        <button class="btn btn-outline-success my-2 my-sm-0 mx-2" type="submit">Search</button>
         <button id="theme-toggle" type="button" class="btn btn-outline-secondary btn-sm mx-2">
                 🌙 Dark Mode
         </button>
     </form>
     
-        {% if current_user.is_authenticated %}
-            <a href="{{ url_for('account') }}" class="btn btn-outline-primary p-1 mr-2">
-                <img src="{{ profile_image }}"
-                     alt="Profile"
-                     width="28"
-                     height="28"
-                     class="rounded-circle">
-            </a>
-            <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">
-                Log Out
-            </a>
-        {% else %}
-            <a href="{{ url_for('login') }}" class="btn btn-outline-success mr-2">
-                Log In
-            </a>
-            <a href="{{ url_for('register') }}" class="btn btn-outline-success mx-2">
-                Register
-            </a>
-        {% endif %}
+    {% if current_user.is_authenticated %}
+        <a href="{{ url_for('account') }}" class="btn btn-outline-primary p-1 mr-2">
+            <img src="{{ profile_image }}" alt="Profile" width="28" height="28" class="rounded-circle">
+        </a>
+        <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">Log Out</a>
+    {% else %}
+        <a href="{{ url_for('login') }}" class="btn btn-outline-success mr-2">Log In</a>
+        <a href="{{ url_for('register') }}" class="btn btn-outline-success mx-2">Register</a>
+    {% endif %}
   </div>
 </nav>
 
 <div class="container mt-4">
     <div class="row">
         <div class="container mt-3">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show">
-                    {{ message }}
-                    <button type="button" class="close" data-dismiss="alert">
-                        <span>&times;</span>
-                    </button>
-                </div>
-            {% endfor %}
-        {% endif %}
-    {%endwith %}
-</div>
-        <!-- Main Content -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
         <div class="col-md-8">
             {% block content %}{% endblock %}
         </div>
 
-        <!-- Sidebar -->
         <div class="col-md-4">
             <div class="card mb-3 shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    Latest Posts
-                </div>
+                <div class="card-header bg-primary text-white">Latest Posts</div>
                 <div class="list-group list-group-flush">
                     <a href="#" class="list-group-item list-group-item-action">Python Tutorial</a>
                     <a href="#" class="list-group-item list-group-item-action">Flask Basics</a>
@@ -262,9 +474,7 @@
             </div>
 
             <div class="card mb-3 shadow-sm">
-                <div class="card-header bg-success text-white">
-                    Announcement
-                </div>
+                <div class="card-header bg-success text-white">Announcement</div>
                 <div class="card-body">
                     🚀 Exciting Update: New Grammar Check Feature is Live!
                     <hr>
@@ -273,9 +483,7 @@
             </div>
 
             <div class="card mb-3 shadow-sm">
-                <div class="card-header bg-dark text-white">
-                    Categories
-                </div>
+                <div class="card-header bg-dark text-white">Categories</div>
                 <div class="list-group list-group-flush">
                     <a href="#" class="list-group-item">Python</a>
                     <a href="#" class="list-group-item">Flask</a>
@@ -285,9 +493,7 @@
             </div>
 
             <div class="card shadow-sm">
-                <div class="card-header bg-warning">
-                    About
-                </div>
+                <div class="card-header bg-warning">About</div>
                 <div class="card-body">
                     H-24 Blog is a place where we share programming tutorials, hacking articles, Android development, Python, Flask and technology updates.
                 </div>
@@ -302,13 +508,80 @@
     </a>
 {% endif %}
 
-<!-- ================= Footer Section ================= -->
 <footer class="site-footer">
+    <div class="footer-celestial"></div>
+
+    <div class="cloudPane">
+        <div class="stars">
+            <div class="star" id="star1"></div>
+            <div class="star" id="star2"></div>
+            <div class="star" id="star3"></div>
+            <div class="star" id="star4"></div>
+            <div class="star" id="star5"></div>
+            <div class="star" id="star6"></div>
+            <div class="star" id="star7"></div>
+        </div>
+
+        <div class="bigCloud" id="cloud1">
+            <div class="largeCircle" id="circ1"><div class="largeCircle" id="circ1shadow"></div></div>
+            <div class="middleCircle" id="circ2"><div class="middleCircle" id="circ2shadow"></div></div>
+            <div class="middleCircle" id="circ3"><div class="middleCircle" id="circ3shadow"></div></div>
+            <div class="smallCircle" id="circ4"></div>
+            <div class="smallCircle" id="circ5"><div class="smallCircle" id="circ5shadow"></div></div>
+            <div class="smallCircle" id="circ6"><div class="smallCircle" id="circ6shadow"></div></div>
+        </div>
+        
+        <div class="bigCloud" id="cloud2">
+            <div class="largeCircle" id="circ1"><div class="largeCircle" id="circ1shadow"></div></div>
+            <div class="middleCircle" id="circ2"><div class="middleCircle" id="circ2shadow"></div></div>
+            <div class="middleCircle" id="circ3"><div class="middleCircle" id="circ3shadow"></div></div>
+            <div class="smallCircle" id="circ4"></div>
+            <div class="smallCircle" id="circ5"><div class="smallCircle" id="circ5shadow"></div></div>
+            <div class="smallCircle" id="circ6"><div class="smallCircle" id="circ6shadow"></div></div>
+        </div>
+
+        <div class="bigCloud" id="cloud3">
+            <div class="largeCircle" id="circ1"><div class="largeCircle" id="circ1shadow"></div></div>
+            <div class="middleCircle" id="circ2"><div class="middleCircle" id="circ2shadow"></div></div>
+            <div class="middleCircle" id="circ3"><div class="middleCircle" id="circ3shadow"></div></div>
+            <div class="smallCircle" id="circ4"></div>
+            <div class="smallCircle" id="circ5"><div class="smallCircle" id="circ5shadow"></div></div>
+            <div class="smallCircle" id="circ6"><div class="smallCircle" id="circ6shadow"></div></div>
+        </div>
+
+        <div class="bigCloud" id="cloud4">
+            <div class="largeCircle" id="circ1"><div class="largeCircle" id="circ1shadow"></div></div>
+            <div class="middleCircle" id="circ2"><div class="middleCircle" id="circ2shadow"></div></div>
+            <div class="middleCircle" id="circ3"><div class="middleCircle" id="circ3shadow"></div></div>
+            <div class="smallCircle" id="circ4"></div>
+            <div class="smallCircle" id="circ5"><div class="smallCircle" id="circ5shadow"></div></div>
+            <div class="smallCircle" id="circ6"><div class="smallCircle" id="circ6shadow"></div></div>
+        </div>
+
+        <div class="bigCloud" id="cloud6">
+            <div class="largeCircle" id="circ1"><div class="largeCircle" id="circ1shadow"></div></div>
+            <div class="middleCircle" id="circ2"><div class="middleCircle" id="circ2shadow"></div></div>
+            <div class="middleCircle" id="circ3"><div class="middleCircle" id="circ3shadow"></div></div>
+            <div class="smallCircle" id="circ4"></div>
+            <div class="smallCircle" id="circ5"><div class="smallCircle" id="circ5shadow"></div></div>
+            <div class="smallCircle" id="circ6"><div class="smallCircle" id="circ6shadow"></div></div>
+        </div>
+
+        <div class="bigCloud" id="cloud7">
+            <div class="largeCircle" id="circ1"><div class="largeCircle" id="circ1shadow"></div></div>
+            <div class="middleCircle" id="circ2"><div class="middleCircle" id="circ2shadow"></div></div>
+            <div class="middleCircle" id="circ3"><div class="middleCircle" id="circ3shadow"></div></div>
+            <div class="smallCircle" id="circ4"></div>
+            <div class="smallCircle" id="circ5"><div class="smallCircle" id="circ5shadow"></div></div>
+            <div class="smallCircle" id="circ6"><div class="smallCircle" id="circ6shadow"></div></div>
+        </div>
+    </div>
+
     <div class="container">
         <div class="row">
             <div class="col-md-4 mb-3">
                 <h5><i class="fa-solid fa-shield-halved text-primary mr-2"></i>H-24 Blog</h5>
-                <p class="small text-muted">
+                <p class="small">
                     A dedicated platform built for tech enthusiasts, exploring cybersecurity, ethical hacking, Python automation, and web development.
                 </p>
             </div>
@@ -338,36 +611,39 @@
                     <a href="https://www.linkedin.com/in/hardik-prajapati-475231390/" target="_blank" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
                     <a href="https://telegram.org" target="_blank" title="Telegram"><i class="fa-brands fa-telegram"></i></a>
                 </div>
-                <p class="small text-muted mb-0">Stay secure, keep coding!</p>
+                <p class="small mb-0">Stay secure, keep coding!</p>
             </div>
         </div>
         <hr class="border-secondary opacity-25 my-3">
         <div class="row align-items-center">
-            <div class="col-md-6 text-center text-md-left small text-muted">
+            <div class="col-md-6 text-center text-md-left small">
                 &copy; 2026 <strong>H-24 Blog</strong>. All rights reserved. Built with Flask.
             </div>
-            <div class="col-md-6 text-center text-md-right small text-muted">
+            <div class="col-md-6 text-center text-md-right small">
                 Designed & Managed by Hardik Prajapati
             </div>
         </div>
     </div>
 </footer>
 
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
 
-<!-- 2. Toggle Button Click Logic -->
 <script>
+    // Hide loader once the page is fully loaded
+    window.addEventListener('load', () => {
+        const loader = document.getElementById('page-loader');
+        loader.classList.add('fade-out');
+    });
+
     const themeToggleBtn = document.getElementById('theme-toggle');
     const htmlElement = document.documentElement;
 
-    // Page load par button ka text set karo
     if (localStorage.getItem('theme') === 'dark') {
         themeToggleBtn.textContent = '☀️ Light Mode';
     }
 
-    // Button click hone par toggle karo
     themeToggleBtn.addEventListener('click', () => {
         htmlElement.classList.toggle('dark-mode');
         

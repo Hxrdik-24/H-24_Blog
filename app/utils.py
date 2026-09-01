@@ -33,6 +33,8 @@ def UserPostCaching(current_user):
         user_posts = current_user.posts
         cache.set(cache_key,user_posts,timeout=300)
     return user_posts
+    
+
 def sendEmail(userEmail, tokenLink):
     api_instance = TransactionalEmailsApi(ApiClient(configuration))
 

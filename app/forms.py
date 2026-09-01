@@ -59,6 +59,7 @@ class UpdateProfile(FlaskForm):   # it is inher. Flask form
 class createPost(FlaskForm):
     title = StringField("Title",validators=[DataRequired(),Length(min=2,max=80) ])
     content =  HiddenField("POST CONTENT",validators=[DataRequired()])
+    tag = StringField("Add Tag ",validators=[Length(min=0,max=20)])
     submit = SubmitField("POST")
 
       
