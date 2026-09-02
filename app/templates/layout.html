@@ -38,13 +38,13 @@
             --input-text: #212529;
             --loader-bg: #f8f9fa;
             
-            /* Light Mode Footer: Night Sky */
-            --footer-bg-gradient: linear-gradient(#111827, #1f2937, #374151, #0b1329);
-            --footer-text: #d4d4d4;
-            --footer-muted: #94a3b8;
-            --footer-link: #60a5fa;
-            --celestial-icon: "🌙";
-            --star-display: block;
+            /* Light Mode Footer: Day Sky */
+            --footer-bg-gradient: linear-gradient(#38bdf8, #7dd3fc, #bae6fd, #e0f2fe);
+            --footer-text: #0f172a;
+            --footer-muted: #334155;
+            --footer-link: #1d4ed8;
+            --celestial-icon: "☀️";
+            --star-display: none; /* Hide stars in day mode */
         }
 
         html.dark-mode {
@@ -57,13 +57,13 @@
             --input-text: #ffffff;
             --loader-bg: #1e1e1e;
             
-            /* Dark Mode Footer: Day Sky */
-            --footer-bg-gradient: linear-gradient(#38bdf8, #7dd3fc, #bae6fd, #e0f2fe);
-            --footer-text: #0f172a;
-            --footer-muted: #334155;
-            --footer-link: #1d4ed8;
-            --celestial-icon: "☀️";
-            --star-display: none; /* Hide stars in day mode */
+            /* Dark Mode Footer: Night Sky */
+            --footer-bg-gradient: linear-gradient(#111827, #1f2937, #374151, #0b1329);
+            --footer-text: #d4d4d4;
+            --footer-muted: #94a3b8;
+            --footer-link: #60a5fa;
+            --celestial-icon: "🌙";
+            --star-display: block;
         }
 
         body {
@@ -276,7 +276,7 @@
             box-shadow: 0 0 4px #fff;
         }
         #star1 { top: 15px; left: 15%; }
-        #star2 { top: 40px; left: 35%Data; }
+        #star2 { top: 40px; left: 35%; }
         #star3 { top: 25px; left: 65%; }
         #star4 { top: 50px; left: 85%; }
         #star5 { top: 10px; left: 90%; }
