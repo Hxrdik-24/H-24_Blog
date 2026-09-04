@@ -1,7 +1,7 @@
 from app import app , db , bcrypt , cache
 from flask import render_template , flash , url_for , redirect ,send_from_directory
 from app.forms import registration, LoginForm , UpdateProfile , createPost , UpdatePost ,OTPForm
-from app.models import  User ,Post
+from app.models import  User ,Post , RequestLog
 from flask import request
 from flask_login import login_user , current_user , logout_user , login_required
 import random
@@ -128,7 +128,10 @@ def postUpdate(post_id):
 
         post.title = form.title.data
         post.content = form.content.data
-
+        if not form.tag.data:
+            post.tag = "General"
+        else:
+            post.tag = form.tag.data    
         db.session.commit()
         refresh_home_cache()
         flash("Post Updated Successfully","success")

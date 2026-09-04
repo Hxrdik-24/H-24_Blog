@@ -36,3 +36,13 @@ class Post(db.Model):
     user_id = db.Column(db.Integer , db.ForeignKey("user.id") , nullable = False)
     def __repr__(self):
         return f"Post('{self.title}','{self.date_posted}'"
+
+class RequestLog(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    ip_address = db.Column(db.String(45), nullable=False)
+    method = db.Column(db.String(10), nullable=False)
+    path = db.Column(db.String(500), nullable=False)
+    status_code = db.Column(db.Integer, nullable=False)
+    user_agent = db.Column(db.String(255), nullable=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+

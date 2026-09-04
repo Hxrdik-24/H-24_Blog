@@ -12,6 +12,16 @@ from sib_api_v3_sdk import (
     TransactionalEmailsApi,
     SendSmtpEmail
 )
+import base64
+from io import BytesIO
+from datetime import datetime
+from reportlab.lib.pagesizes import A4
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib import colors
+from sib_api_v3_sdk import TransactionalEmailsApi, ApiClient, SendSmtpEmail, Configuration
+
+
 
 def refresh_home_cache():
     latest_posts = (
@@ -187,3 +197,109 @@ def verifyToken(token,expiration=1500):
     except Exception as e:
         print(f'Toke Error {e}')
         return None
+
+
+def generate_logs_pdf(logs):
+    """Logs array ko lekar ReportLab PDF BytesIO buffer return karta hai."""
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(
+        buffer, 
+        pagesize=A4, 
+        rightMargin=15, 
+        leftMargin=15, 
+        topMargin=20, 
+        bottomMargin=20
+    )
+    elements = []
+
+    # Title & Subtitle Styling
+    styles = getSampleStyleSheet()
+    title = Paragraph("<b><font size=16 color='#1e293b'>Traffic Requests Log Backup Report</font></b>", styles['Title'])
+    elements.append(title)
+    
+    info_text = f"<font size=9 color='#64748b'>Generated on: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC | Total Records: {len(logs)}</font>"
+    elements.append(Paragraph(info_text, styles['Normal']))
+    elements.append(Spacer(1, 15))
+
+    # Table Header Data
+    data = [["ID", "Time (UTC)", "IP Address", "Method", "Path / Page", "Status"]]
+
+    # Table Rows Data
+    for log in logs:
+        short_path = log.path if len(log.path) <= 35 else log.path[:32] + "..."
+        data.append([
+            str(log.id),
+            log.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+            log.ip_address,
+            log.method,
+            short_path,
+            str(log.status_code)
+        ])
+
+    table = Table(data, colWidths=[35, 115, 95, 50, 220, 45])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1e293b")),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 8),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#cbd5e1")),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")])
+    ]))
+
+    elements.append(table)
+    doc.build(elements)
+
+    buffer.seek(0)
+    return buffer
+
+
+def send_logs_pdf_email(pdf_buffer, total_logs_count):
+    api_instance = TransactionalEmailsApi(ApiClient(configuration))
+    pdf_bytes = pdf_buffer.getvalue()
+    base64_pdf = base64.b64encode(pdf_bytes).decode('utf-8')
+
+    filename = f"traffic_logs_backup_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.pdf"
+
+    send_smtp_email = SendSmtpEmail(
+        sender={
+            "name": "H-24 Blog",
+            "email": "dhhardik242008@gmail.com"
+        },
+        to=[
+            {
+                "email": "hardikprajapati242008@gmail.com",
+                "name": "H-24 Blog App"
+            }
+        ],
+        subject=f"Traffic Logs Backup ({total_logs_count} Records) Before DB Clear",
+        html_content=f"""
+        <!DOCTYPE html>
+        <html>
+        <body style="font-family: Arial, sans-serif; background-color: #f4f7fb; padding: 20px;">
+            <div style="max-width: 600px; background: #ffffff; padding: 25px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <h2 style="color: #1e293b; margin-top: 0;">Database Logs Backup Report</h2>
+                <p style="color: #475569;">Hello Admin,</p>
+                <p style="color: #475569;">before Deleting <b>{total_logs_count} records</b> pdf is attached.</p>
+                <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;">
+                <p style="font-size: 12px; color: #94a3b8;">Timestamp: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC</p>
+            </div>
+        </body>
+        </html>
+        """,
+        attachment=[
+            {
+                "content": base64_pdf,
+                "name": filename
+            }
+        ]
+    )
+
+    try:
+        api_instance.send_transac_email(send_smtp_email)
+        print("Backup Email with PDF Sent Successfully!")
+        return True
+    except Exception as e:
+        print("Error sending email:", e)
+        return False

@@ -86,3 +86,4 @@ configuration.api_key["api-key"] = os.getenv("BREVO_API")
 #---------------------------------
 from app import models
 from app import routes
+from app import admin_route
