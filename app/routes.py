@@ -431,3 +431,7 @@ def helth():
 # @app.route('/google7c80791f63896477.html')
 # def google_verification():
 #     return  send_from_directory('.', 'google7c80791f63896477.html')
+
+@app.route('/glob')
+def glob():
+    return render_template('glob.html')

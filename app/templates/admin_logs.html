@@ -1,6 +1,10 @@
 {% extends "layout.html" %}
 
 {% block content %}
+<!-- MapLibre 3D Library Assets -->
+<link href="https://unpkg.com/maplibre-gl@^3.6.0/dist/maplibre-gl.css" rel="stylesheet" />
+<script src="https://unpkg.com/maplibre-gl@^3.6.0/dist/maplibre-gl.js"></script>
+
 <style>
     /* Layout styling adjustments for Logs Dashboard */
     .admin-card {
@@ -35,13 +39,106 @@
     .status-404, .status-500 { color: #dc3545; font-weight: bold; }
 
     .user-agent-cell {
-        max-width: 170px;
+        max-width: 150px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         font-size: 0.78rem;
         opacity: 0.75;
     }
+
+    /* 3D Map Modal Overlay & Control Panel Styling */
+    #mapModal .modal-content {
+        background-color: #000;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    #map {
+        width: 100%;
+        height: 75vh;
+        min-height: 450px;
+    }
+
+    .control-panel {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        z-index: 100;
+        background: rgba(15, 23, 42, 0.92);
+        backdrop-filter: blur(12px);
+        padding: 14px 16px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        width: 320px;
+        color: white;
+        box-sizing: border-box;
+    }
+
+    .panel-title {
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        color: #38bdf8;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .input-row {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 8px;
+    }
+
+    .control-panel input {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #fff;
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        outline: none;
+        flex: 1;
+    }
+
+    .control-panel input::placeholder { color: #94a3b8; }
+    .control-panel input:focus { border-color: #38bdf8; background: rgba(255, 255, 255, 0.12); }
+
+    .control-panel button {
+        background: #0284c7;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 12px;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .control-panel button:hover { background: #0369a1; }
+    .control-panel button.btn-ip { background: #16a34a; }
+    .control-panel button.btn-ip:hover { background: #15803d; }
+
+    .divider {
+        text-align: center;
+        font-size: 9px;
+        color: #64748b;
+        margin: 6px 0;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .ip-info-box {
+        color: #0f172a;
+        font-size: 12px;
+        line-height: 1.4;
+    }
+    .ip-info-box b { color: #0284c7; }
 </style>
 
 <!-- Top Header Section & Action Buttons -->
@@ -119,6 +216,7 @@
                         <th>Path / Page</th>
                         <th>Status</th>
                         <th>User Agent</th>
+                        <th class="text-center">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -135,15 +233,20 @@
                                 <span class="badge badge-info">{{ log.method }}</span>
                             {% endif %}
                         </td>
-                        <td class="font-weight-bold text-break" style="max-width: 180px;">{{ log.path }}</td>
+                        <td class="font-weight-bold text-break" style="max-width: 160px;">{{ log.path }}</td>
                         <td class="status-{{ log.status_code }}">{{ log.status_code }}</td>
                         <td class="user-agent-cell" title="{{ log.user_agent }}">
                             {{ log.user_agent }}
                         </td>
+                        <td class="text-center">
+                            <button class="btn btn-xs btn-outline-info font-weight-bold shadow-sm py-1 px-2" onclick="openMapForIP('{{ log.ip_address }}')">
+                                <i class="fa-solid fa-earth-americas mr-1"></i> Quick Info
+                            </button>
+                        </td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="6" class="text-center py-4 text-muted">
+                        <td colspan="7" class="text-center py-4 text-muted">
                             <i class="fa-solid fa-inbox fa-2x mb-2 d-block"></i>
                             NO Logs Found. All Clear!
                         </td>
@@ -154,4 +257,293 @@
         </div>
     </div>
 </div>
+
+<!-- ========================================== -->
+<!-- 3D GLOBE MAP MODAL -->
+<!-- ========================================== -->
+<div class="modal fade" id="mapModal" tabindex="-1" role="dialog" aria-labelledby="mapModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document" style="max-width: 92vw;">
+        <div class="modal-content text-white">
+            <div class="modal-header py-2 px-3 border-secondary" style="background: #0f172a;">
+                <h5 class="modal-title font-weight-bold text-info" id="mapModalLabel" style="font-size: 1rem;">
+                    <i class="fa-solid fa-globe mr-2"></i>3D IP Location Tracker & Visualizer
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-0" style="position: relative;">
+                
+                <!-- Floating Controls Overlay -->
+                <div class="control-panel">
+                    <div class="panel-title">🌐 IP & Location Visualizer</div>
+                    
+                    <!-- Option 1: IP Search -->
+                    <div class="input-row">
+                        <input type="text" id="ipInput" placeholder="IP Address..." />
+                        <button class="btn-ip" onclick="trackIP()">Track</button>
+                        <button style="background:#475569;" onclick="trackMyIP()">My IP</button>
+                    </div>
+
+                    <div class="divider">— SEARCH PLACE —</div>
+
+                    <!-- Option 2: Place Search -->
+                    <div class="input-row">
+                        <input type="text" id="searchInput" placeholder="Place (e.g. Delhi, Taj Mahal)..." />
+                        <button onclick="searchLocation()">Search</button>
+                    </div>
+
+                    <div class="divider">— COORDINATES —</div>
+
+                    <!-- Option 3: Lat/Lon Search -->
+                    <div class="input-row">
+                        <input type="number" id="latInput" placeholder="Lat" step="any">
+                        <input type="number" id="lonInput" placeholder="Lon" step="any">
+                        <button onclick="goToCoords()">Go</button>
+                    </div>
+                </div>
+
+                <!-- Map Canvas Container -->
+                <div id="map"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let map = null;
+    let currentMarker = null;
+    let isMapInitialized = false;
+
+    // Initialize Map Function
+    function initMap() {
+        if (isMapInitialized) return;
+
+        map = new maplibregl.Map({
+            container: 'map',
+            style: {
+                version: 8,
+                sources: {
+                    'esri-satellite': {
+                        type: 'raster',
+                        tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
+                        tileSize: 256,
+                        attribution: 'Esri, Maxar'
+                    },
+                    'esri-labels': {
+                        type: 'raster',
+                        tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}'],
+                        tileSize: 256
+                    }
+                },
+                layers: [
+                    { id: 'satellite-layer', type: 'raster', source: 'esri-satellite' },
+                    { id: 'labels-layer', type: 'raster', source: 'esri-labels' }
+                ]
+            },
+            center: [77.2090, 28.6139],
+            zoom: 2,
+            pitch: 35,
+            projection: 'globe'
+        });
+
+        map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }));
+        isMapInitialized = true;
+    }
+
+    // Common Fly-To & Marker Function
+    function flyToTarget(lon, lat, popupHTMLContent) {
+        if (!map) return;
+
+        if (currentMarker) currentMarker.remove();
+
+        currentMarker = new maplibregl.Marker({ color: '#ef4444' })
+            .setLngLat([lon, lat])
+            .setPopup(new maplibregl.Popup().setHTML(popupHTMLContent))
+            .addTo(map);
+
+        currentMarker.togglePopup();
+
+        map.flyTo({
+            center: [lon, lat],
+            zoom: 12,
+            pitch: 50,
+            speed: 1.2,
+            curve: 1.4,
+            essential: true
+        });
+    }
+
+    // Smart Multi-API IP Geolocation Function (Auto-Fallback)
+    async function fetchIPInfo(ip) {
+        // Service 1: FreeIPAPI
+        try {
+            const res = await fetch(`https://freeipapi.com/api/json/${ip}`);
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.latitude) {
+                    return {
+                        success: true,
+                        ip: data.ipAddress || ip,
+                        country: data.countryName || 'N/A',
+                        city: data.cityName || 'N/A',
+                        region: data.regionName || 'N/A',
+                        latitude: data.latitude,
+                        longitude: data.longitude,
+                        isp: data.zipCode ? `Postal Code: ${data.zipCode}` : 'N/A'
+                    };
+                }
+            }
+        } catch (e) { console.warn("Service 1 failed, trying Service 2..."); }
+
+        // Service 2: IPWho.is
+        try {
+            const res = await fetch(`https://ipwho.is/${ip}`);
+            if (res.ok) {
+                const data = await res.json();
+                if (data.success) {
+                    return {
+                        success: true,
+                        ip: data.ip,
+                        country: data.country,
+                        city: data.city,
+                        region: data.region,
+                        latitude: data.latitude,
+                        longitude: data.longitude,
+                        isp: data.connection?.isp || 'N/A'
+                    };
+                }
+            }
+        } catch (e) { console.warn("Service 2 failed, trying Service 3..."); }
+
+        // Service 3: IPAPI.co
+        try {
+            const res = await fetch(`https://ipapi.co/${ip}/json/`);
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.latitude && !data.error) {
+                    return {
+                        success: true,
+                        ip: data.ip,
+                        country: data.country_name,
+                        city: data.city,
+                        region: data.region,
+                        latitude: data.latitude,
+                        longitude: data.longitude,
+                        isp: data.org || data.asn || 'N/A'
+                    };
+                }
+            }
+        } catch (e) { console.warn("All services failed."); }
+
+        return { success: false, message: "APIs limit exceeded or invalid IP address." };
+    }
+
+    // Track IP Function
+    async function trackIP(targetIP = '') {
+        const ip = targetIP || document.getElementById('ipInput').value.trim();
+        const btn = document.querySelector('.btn-ip');
+        const originalText = btn.innerText;
+        btn.innerText = '...';
+        btn.disabled = true;
+
+        const data = await fetchIPInfo(ip);
+
+        btn.innerText = originalText;
+        btn.disabled = false;
+
+        if (!data.success) {
+            alert(data.message);
+            return;
+        }
+
+        const lat = data.latitude;
+        const lon = data.longitude;
+
+        document.getElementById('latInput').value = lat;
+        document.getElementById('lonInput').value = lon;
+        document.getElementById('ipInput').value = data.ip;
+
+        const popupHTML = `
+            <div class="ip-info-box">
+                <h5 style="margin:0 0 6px 0; color:#0f172a;">📍 IP Details: ${data.ip}</h5>
+                <b>Country:</b> ${data.country}<br>
+                <b>City/Region:</b> ${data.city}, ${data.region}<br>
+                <b>ISP/Info:</b> ${data.isp}<br>
+                <b>Coordinates:</b> ${lat}, ${lon}
+            </div>
+        `;
+
+        flyToTarget(lon, lat, popupHTML);
+    }
+
+    function trackMyIP() {
+        trackIP('');
+    }
+
+    async function searchLocation() {
+        const query = document.getElementById('searchInput').value;
+        if (!query) return;
+
+        try {
+            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+            const data = await response.json();
+
+            if (data.length === 0) {
+                alert('Location not found!');
+                return;
+            }
+
+            const lat = parseFloat(data[0].lat);
+            const lon = parseFloat(data[0].lon);
+
+            document.getElementById('latInput').value = lat;
+            document.getElementById('lonInput').value = lon;
+
+            const popupHTML = `<div class="ip-info-box"><b>Location:</b> ${data[0].display_name}</div>`;
+            flyToTarget(lon, lat, popupHTML);
+
+        } catch (err) {
+            alert('Search error!');
+        }
+    }
+
+    function goToCoords() {
+        const lat = parseFloat(document.getElementById('latInput').value);
+        const lon = parseFloat(document.getElementById('lonInput').value);
+
+        if (isNaN(lat) || isNaN(lon)) {
+            alert('Enter valid Latitude & Longitude!');
+            return;
+        }
+
+        const popupHTML = `<div class="ip-info-box"><b>Custom Coords:</b> ${lat}, ${lon}</div>`;
+        flyToTarget(lon, lat, popupHTML);
+    }
+
+    // Main Trigger Function called from "Quick Info" button
+    function openMapForIP(ip) {
+        // Trigger Bootstrap Modal
+        if (window.jQuery && $('#mapModal').modal) {
+            $('#mapModal').modal('show');
+        } else {
+            const modalEl = document.getElementById('mapModal');
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+        }
+
+        // Initialize and resize map inside modal smoothly
+        setTimeout(() => {
+            initMap();
+            map.resize();
+            trackIP(ip);
+        }, 300);
+    }
+
+    // Keyboard bindings
+    document.getElementById('ipInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') trackIP(); });
+    document.getElementById('searchInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') searchLocation(); });
+    document.getElementById('latInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') goToCoords(); });
+    document.getElementById('lonInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') goToCoords(); });
+</script>
 {% endblock %}
