@@ -1,0 +1,201 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<style>
+.chat-container {
+    border-radius: 16px;
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 600px;
+}
+
+.chat-header {
+    background: #0d6efd;
+    color: #fff;
+    padding: 14px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-box {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: #f8fafc;
+}
+
+.chat-msg {
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.msg-user {
+    background: #0d6efd;
+    color: #fff;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+}
+
+.msg-bot {
+    background: #e2e8f0;
+    color: #1e293b;
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+}
+
+.chat-footer {
+    padding: 12px 16px;
+    background: #fff;
+    border-top: 1px solid #dee2e6;
+}
+
+.char-counter {
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #64748b;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.char-counter.limit-reached {
+    color: #dc3545;
+}
+
+/* Dark Mode Support */
+html.dark-mode .chat-container {
+    background: #252526;
+    border-color: #333333;
+}
+html.dark-mode .chat-box {
+    background: #1e1e1e;
+}
+html.dark-mode .chat-footer {
+    background: #252526;
+    border-color: #333333;
+}
+html.dark-mode .msg-bot {
+    background: #334155;
+    color: #f1f5f9;
+}
+</style>
+
+<div class="card chat-container shadow-sm mb-4">
+    <div class="chat-header">
+        <div class="d-flex align-items-center">
+            <i class="fa-solid fa-robot mr-2"></i>
+            <strong>H-24 AI Assistant</strong>
+        </div>
+        <span class="badge badge-light">Limit: 5 queries / day</span>
+    </div>
+
+    <div class="chat-box" id="chatBox">
+        <div class="chat-msg msg-bot">
+            Hello! Ask me any quick tech question (Maximum 40 characters).
+        </div>
+    </div>
+
+    <div class="chat-footer">
+        <div class="char-counter" id="charCounter">
+            <span>Limit: Max 40 characters</span>
+            <span id="charCount">0 / 40</span>
+        </div>
+        <form id="chatForm" class="d-flex gap-2">
+            <input 
+                type="text" 
+                id="promptInput" 
+                class="form-control" 
+                placeholder="Ask something short..." 
+                maxlength="40" 
+                autocomplete="off" 
+                required
+            >
+            <button class="btn btn-primary ml-2" type="submit" id="sendBtn">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+const chatBox = document.getElementById("chatBox");
+const chatForm = document.getElementById("chatForm");
+const promptInput = document.getElementById("promptInput");
+const sendBtn = document.getElementById("sendBtn");
+const charCount = document.getElementById("charCount");
+const charCounter = document.getElementById("charCounter");
+
+// Real-time character count tracker
+promptInput.addEventListener("input", () => {
+    const len = promptInput.value.length;
+    charCount.textContent = `${len} / 40`;
+    if (len >= 40) {
+        charCounter.classList.add("limit-reached");
+    } else {
+        charCounter.classList.remove("limit-reached");
+    }
+});
+
+function appendMessage(text, sender) {
+    const msgDiv = document.createElement("div");
+    msgDiv.classList.add("chat-msg", sender === "user" ? "msg-user" : "msg-bot");
+    msgDiv.textContent = text;
+    chatBox.appendChild(msgDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+chatForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const prompt = promptInput.value.trim();
+
+    if (!prompt) return;
+    if (prompt.length > 40) {
+        alert("Prompt must be 40 characters or fewer.");
+        return;
+    }
+
+    appendMessage(prompt, "user");
+    promptInput.value = "";
+    charCount.textContent = "0 / 40";
+    charCounter.classList.remove("limit-reached");
+    
+    promptInput.disabled = true;
+    sendBtn.disabled = true;
+
+    try {
+        const response = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ prompt: prompt })
+        });
+
+        const data = await response.json();
+
+        if (response.status === 429) {
+            appendMessage("Daily limit reached! You can only send 5 requests per day.", "msg-bot");
+        } else if (!response.ok) {
+            appendMessage(data.error || "An error occurred.", "msg-bot");
+        } else {
+            appendMessage(data.reply, "msg-bot");
+        }
+    } catch (err) {
+        appendMessage("Network error. Please try again.", "msg-bot");
+    } finally {
+        promptInput.disabled = false;
+        sendBtn.disabled = false;
+        promptInput.focus();
+    }
+});
+</script>
+{% endblock %}

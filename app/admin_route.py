@@ -9,7 +9,7 @@ from flask_login import current_user, login_required
 from app import app, db
 from app.models import RequestLog
 from app.utils import generate_logs_pdf, send_logs_pdf_email
-
+import os
 # ==========================================
 # IN-MEMORY BATCH LOGGING QUEUE SETUP
 # ==========================================
@@ -48,8 +48,8 @@ worker_thread.start()
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not current_user.is_authenticated or current_user.email != 'hardikprajapati242008@gmail.com':
-            flash("Access Denied! Aapko is page ko view karne ki permission nahi hai.", "danger")
+        if not current_user.is_authenticated or current_user.email != f'{os.getenv("ADMIN_EMAIL")}':
+            flash("Access Denied !", "danger")
             return redirect(url_for('home'))  
         return f(*args, **kwargs)
     return decorated_function

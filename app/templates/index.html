@@ -3,289 +3,556 @@
 {% block content %}
 
 <style>
-
-.post-card{
-    border:0;
-    border-radius:18px;
-    transition:.25s;
+.post-card {
+    border: 0;
+    border-radius: 18px;
+    transition: transform .25s ease, box-shadow .25s ease;
 }
 
-.post-card:hover{
-    transform:translateY(-2px);
-    box-shadow:0 .5rem 1rem rgba(0,0,0,.12)!important;
+.post-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.12) !important;
 }
 
-.author-img{
-    width:52px;
-    height:52px;
-    object-fit:cover;
-    border-radius:50%;
-    border:2px solid #dee2e6;
+.author-img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover !important;
+    border-radius: 50% !important;
+    border: 2px solid #dee2e6;
 }
 
 /* Username */
-
-.author-name{
-    font-weight:700;
-    font-size:1rem;
-    display:flex;
-    align-items:center;
-    gap:8px;
+.author-name {
+    font-weight: 700;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
-/* Role Badge */
-
-.role-badge{
-
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-
-    min-width:28px;
-    height:28px;
-
-    padding:0 10px;
-
-    border-radius:50px;
-
-    font-size:.75rem;
-    font-weight:600;
-
-    transition:.25s;
-
-    cursor:default;
-
-    user-select:none;
-
+/* Role Badges */
+.role-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    padding: 0 10px;
+    border-radius: 50px;
+    font-size: .75rem;
+    font-weight: 600;
+    transition: .25s;
+    cursor: default;
+    user-select: none;
 }
 
-.role-badge:hover{
-
-    transform:translateY(-2px) scale(1.06);
-
+.role-badge:hover {
+    transform: translateY(-2px) scale(1.06);
 }
 
-/* Special */
-
-.role-special{
-
-    background:linear-gradient(135deg,#FFD54F,#FFB300);
-    color:#4d3600;
-
-    box-shadow:
-    0 0 10px rgba(255,193,7,.35);
-
+.role-special {
+    background: linear-gradient(135deg, #FFD54F, #FFB300);
+    color: #4d3600;
+    box-shadow: 0 0 10px rgba(255,193,7,.35);
 }
 
-/* Editor */
-
-.role-editor{
-
-    background:#0d6efd;
-    color:#fff;
-
+.role-editor {
+    background: #0d6efd;
+    color: #fff;
 }
 
-/* Verified */
+.role-verified {
+    background: #198754;
+    color: #fff;
+}
 
-.role-verified{
+/* Post Tag Badges */
+.post-tag-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background-color: #e9ecef;
+    color: #495057;
+    text-decoration: none !important;
+    transition: all 0.2s ease;
+}
 
-    background:#198754;
-    color:#fff;
+.post-tag-badge:hover {
+    background-color: #0d6efd;
+    color: #fff !important;
+}
 
+/* Tag Filter Bar */
+.tag-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,0,0,0.03);
+    padding: 12px 16px;
+    border-radius: 14px;
+}
+
+.filter-pill {
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none !important;
+    border: 1px solid #dee2e6;
+    background: #fff;
+    color: #495057;
+    transition: all 0.2s ease;
+}
+
+.filter-pill:hover {
+    border-color: #0d6efd;
+    color: #0d6efd;
+}
+
+.filter-pill.active {
+    background: #0d6efd;
+    color: #fff;
+    border-color: #0d6efd;
 }
 
 /* Title */
-
-.post-title{
-
-    font-weight:700;
-    margin-bottom:15px;
-
+.post-title {
+    font-weight: 700;
+    margin-bottom: 12px;
 }
 
-/* Content */
-
-.post-content{
-
-    overflow:hidden;
-    transition:.35s;
-
+.post-title a {
+    color: inherit;
+    text-decoration: none;
 }
 
-.post-content.collapsed{
-
-    display:-webkit-box;
-    -webkit-line-clamp:5;
-    -webkit-box-orient:vertical;
-
+.post-title a:hover {
+    color: #0d6efd;
 }
 
-/* Read More */
-
-.toggle-btn{
-
-    padding:0;
-    margin-top:15px;
-
-    font-weight:600;
-
-    text-decoration:none;
-
+/* Content Truncation */
+.post-content {
+    overflow: hidden;
+    position: relative;
+    transition: max-height 0.3s ease;
 }
 
-.toggle-btn:hover{
-
-    text-decoration:underline;
-
+.post-content.collapsed {
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    max-height: 140px; /* safety ceiling for non-webkit engines */
 }
 
-.post-content img, 
+.post-content img,
 .card img {
     max-width: 100% !important;
     height: auto !important;
     display: block;
-    margin: 10px auto; 
-    border-radius: 6px; 
+    margin: 10px auto;
+    border-radius: 8px;
 }
-.author-img {
-    width: 50px; 
-    height: 50px;     
-    border-radius: 350% !important; 
-    object-fit: cover !important;  
+
+/* Read More */
+.toggle-btn {
+    padding: 0;
+    margin-top: 12px;
+    font-weight: 600;
+    text-decoration: none !important;
+    display: inline-block;
 }
-</style>
 
-{% for post in posts %}
+.toggle-btn:hover {
+    text-decoration: underline !important;
+}
+/* --- Tag Filter Bar Wrapper --- */
+.tag-filter-wrapper {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
 
-<div class="card shadow-sm mb-4 post-card">
+.tag-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    background: rgba(13, 110, 253, 0.04);
+    padding: 10px 14px;
+    border-radius: 20px;
+    border: 1px dashed rgba(13, 110, 253, 0.25);
+    backdrop-filter: blur(8px);
+}
 
-    <div class="card-body">
+/* Base Pill Style */
+.filter-pill {
+    position: relative;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none !important;
+    border: 1.5px solid #dbeafe;
+    background: #ffffff;
+    color: #475569;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    z-index: 1;
+    white-space: nowrap;
+    transition: color 0.35s ease, border-color 0.35s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
 
-        <!-- Header -->
+.filter-pill::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #0d6efd 0%, #00c6ff 100%);
+    z-index: -1;
+    transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 50px;
+}
 
-        <div class="d-flex align-items-center mb-3">
+.filter-pill:hover {
+    color: #ffffff !important;
+    border-color: transparent;
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 6px 14px rgba(13, 110, 253, 0.25);
+}
 
-            <img
-                src="{{ post.author.image_file }}"
-                class="author-img me-3"
-                alt="Profile"
-            >
+.filter-pill:hover::before {
+    left: 0;
+}
 
-            <div class="flex-grow-1">
+.filter-pill.active {
+    background: linear-gradient(135deg, #0d6efd 0%, #2563eb 100%);
+    color: #ffffff !important;
+    border-color: transparent;
+    box-shadow: 0 4px 14px rgba(13, 110, 253, 0.4);
+    animation: activeGlowPulse 2.8s infinite ease-in-out;
+}
 
-                <div class="author-name">
+.filter-pill.active::before {
+    left: 0;
+}
 
-                    {{ post.author.username }}
+@keyframes activeGlowPulse {
+    0%, 100% { box-shadow: 0 4px 14px rgba(13, 110, 253, 0.35); }
+    50% { box-shadow: 0 4px 20px rgba(13, 110, 253, 0.65); }
+}
 
-                    {% if post.author.profile_type == "special" %}
+/* More Pill Button - Same height & line */
+.more-pill-btn {
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #0d6efd, #0056b3);
+    color: #fff !important;
+    border: none;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    box-shadow: 0 3px 10px rgba(13, 110, 253, 0.3);
+    transition: transform 0.2s ease;
+}
 
-                        <span
-                            class="role-badge role-special"
-                            title="Special Creator"
-                        >
-                            Admin | Hardik 💞
-                        </span>
+.more-pill-btn:active {
+    transform: scale(0.94);
+}
 
-                    {% elif post.author.profile_type == "editor" %}
+/* Expanded Dropdown Tray for Overflowing Tags */
+.overflow-tags-tray {
+    display: none;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+    padding-top: 10px;
+    border-top: 1px dashed rgba(13, 110, 253, 0.2);
+    width: 100%;
+}
 
-                        <span
-                            class="role-badge role-editor"
-                            title="Editor"
-                        >
-                            Editor
-                        </span>
+.overflow-tags-tray.open {
+    display: flex;
+    animation: fadeInTray 0.25s ease-out;
+}
 
-                    {% elif post.author.profile_type == "verified" %}
+@keyframes fadeInTray {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
-                        <span
-                            class="role-badge role-verified"
-                            title="Verified"
-                        >
-                            ✔
-                        </span>
+/* Dark Mode Adaptation */
+html.dark-mode .tag-filter-bar {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.1);
+}
 
-                    {% endif %}
+html.dark-mode .filter-pill {
+    background: #252526;
+    border-color: #3f3f46;
+    color: #e2e8f0;
+}
 
-                </div>
+html.dark-mode .overflow-tags-tray {
+    border-top-color: rgba(255, 255, 255, 0.1);
+}
+</style><!-- Tag Filter Section -->
+<div class="tag-filter-wrapper">
+    <div class="tag-filter-bar shadow-sm" id="tagFilterBar">
+        
+        <span class="text-muted small font-weight-bold mr-1 d-none d-md-inline" id="tagTitle">
+            <i class="fa-solid fa-tags mr-1"></i> Tags:
+        </span>
 
-                <small class="text-muted">
+        <!-- Primary Tags Row -->
+        <a href="{{ url_for('home') }}" 
+           class="filter-pill tag-item {{ 'active' if not selected_tag else '' }}">
+           All
+        </a>
 
-                    {{ post.date_posted.strftime('%d %b %Y • %I:%M %p') }}
+        {% for t in tags %}
+            <a href="{{ url_for('home', tag=t) }}" 
+               class="filter-pill tag-item {{ 'active' if selected_tag and selected_tag.lower() == t.lower() else '' }}">
+               #{{ t }}
+            </a>
+        {% endfor %}
 
-                </small>
-
-            </div>
-
-        </div>
-
-        <!-- Title -->
-
-        <h3 class="post-title">
-
-            {{ post.title }}
-
-        </h3>
-
-        <!-- Content -->
-
-        <div
-            id="content-{{ post.id }}"
-            class="post-content collapsed"
-        >
-
-            {{ post.content | safe }}
-
-        </div>
-
-        <button
-            class="btn btn-link toggle-btn"
-            onclick="togglePost({{ post.id }}, this)">
-
-            Read More ↓
-
+        <!-- Inline More Button (Automatically placed as the last item in line 1) -->
+        <button type="button" id="morePillBtn" class="more-pill-btn" onclick="toggleTagsTray()">
+            <span id="morePillText">+ More</span>
+            <i class="fa-solid fa-chevron-down" id="morePillIcon" style="font-size: 0.7rem;"></i>
         </button>
 
+        <!-- Hidden Tray that reveals all hidden tags when More is clicked -->
+        <div class="overflow-tags-tray" id="overflowTray"></div>
     </div>
-
 </div>
+<!-- Posts Stream -->
+{% if posts %}
+    {% for post in posts %}
+    <div class="card shadow-sm mb-4 post-card" id="post-card-{{ post.id }}">
+        <div class="card-body">
 
-{% endfor %}
+            <!-- Header -->
+            <div class="d-flex align-items-center mb-3">
+                <img
+                    src="{{ post.author.image_file }}"
+                    class="author-img mr-3"
+                    alt="Profile"
+                >
+
+                <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <div class="author-name">
+                            <span>{{ post.author.username }}</span>
+
+                            {% if post.author.profile_type == "special" %}
+                                <span class="role-badge role-special" title="Special Creator">
+                                    Admin | Hardik 💞
+                                </span>
+                            {% elif post.author.profile_type == "editor" %}
+                                <span class="role-badge role-editor" title="Editor">
+                                    Editor
+                                </span>
+                            {% elif post.author.profile_type == "verified" %}
+                                <span class="role-badge role-verified" title="Verified">
+                                    ✔
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        {% if post.tag %}
+                            <a href="{{ url_for('home', tag=post.tag) }}" class="post-tag-badge">
+                                #{{ post.tag }}
+                            </a>
+                        {% endif %}
+                    </div>
+
+                    <small class="text-muted">
+                        {{ post.date_posted.strftime('%d %b %Y • %I:%M %p') }}
+                    </small>
+                </div>
+            </div>
+
+            <!-- Title -->
+            <h3 class="post-title">
+                <a href="{{ url_for('post', post_id=post.id) }}">{{ post.title }}</a>
+            </h3>
+
+            <!-- Content -->
+            <div id="content-{{ post.id }}" class="post-content collapsed">
+                {{ post.content | safe }}
+            </div>
+
+            <!-- Toggle Button -->
+            <button
+                id="btn-{{ post.id }}"
+                class="btn btn-link toggle-btn"
+                onclick="togglePost({{ post.id }})">
+                Read More ↓
+            </button>
+
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="card shadow-sm p-4 text-center">
+        <h5 class="text-muted mb-2">No posts found</h5>
+        <p class="small text-muted mb-3">
+            {% if selected_tag %}
+                There are no posts categorized under <strong>#{{ selected_tag }}</strong>.
+            {% else %}
+                No posts have been published yet.
+            {% endif %}
+        </p>
+        <div>
+            <a href="{{ url_for('home') }}" class="btn btn-sm btn-outline-primary">View All Posts</a>
+        </div>
+    </div>
+{% endif %}
 
 <script>
+function evaluatePostClamping() {
+    document.querySelectorAll(".post-content").forEach(function(post) {
+        const button = post.nextElementSibling;
+        if (!button || !button.classList.contains("toggle-btn")) return;
 
-function togglePost(id, button){
-
-    const post=document.getElementById("content-"+id);
-
-    if(post.classList.contains("collapsed")){
-
-        post.classList.remove("collapsed");
-
-        button.innerHTML="Show Less ↑";
-
-    }else{
-
-        post.classList.add("collapsed");
-
-        button.innerHTML="Read More ↓";
-
-    }
-
+        // If content height fits inside the collapsed limits, hide the toggle button
+        if (post.scrollHeight <= post.clientHeight + 8) {
+            button.style.display = "none";
+        } else {
+            button.style.display = "inline-block";
+        }
+    });
 }
 
-document.querySelectorAll(".post-content").forEach(function(post){
+function togglePost(id) {
+    const post = document.getElementById("content-" + id);
+    const button = document.getElementById("btn-" + id);
+    const card = document.getElementById("post-card-" + id);
 
-    const button=post.nextElementSibling;
+    if (post.classList.contains("collapsed")) {
+        post.classList.remove("collapsed");
+        button.innerHTML = "Show Less ↑";
+    } else {
+        post.classList.add("collapsed");
+        button.innerHTML = "Read More ↓";
+        
+        // Smooth scroll back to top of the card so the user doesn't get disoriented
+        if (card) {
+            card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+    }
+}
 
-    if(post.scrollHeight<=post.clientHeight+5){
+// Evaluate after DOM is ready
+document.addEventListener("DOMContentLoaded", evaluatePostClamping);
 
-        button.style.display="none";
+// Re-evaluate once images and fonts finish rendering to get exact heights
+window.addEventListener("load", evaluatePostClamping);
 
+// Handle individual image load events inside posts for dynamic adjustments
+document.querySelectorAll(".post-content img").forEach(img => {
+    if (!img.complete) {
+        img.addEventListener("load", evaluatePostClamping);
+    }
+});let isTrayOpen = false;
+
+function arrangeMobileTags() {
+    const bar = document.getElementById("tagFilterBar");
+    const moreBtn = document.getElementById("morePillBtn");
+    const tray = document.getElementById("overflowTray");
+    const tags = Array.from(bar.querySelectorAll(".tag-item"));
+
+    if (!bar || !moreBtn || !tray) return;
+
+    // Desktop view (> 768px): normal flow, sab inline
+    if (window.innerWidth > 768) {
+        tags.forEach(el => {
+            el.style.display = "inline-flex";
+            bar.insertBefore(el, moreBtn);
+        });
+        moreBtn.style.display = "none";
+        tray.classList.remove("open");
+        tray.innerHTML = "";
+        return;
     }
 
-});
+    // Mobile View:
+    // Reset state before measuring
+    moreBtn.style.display = "inline-flex";
+    tray.classList.remove("open");
+    tray.innerHTML = "";
+    isTrayOpen = false;
+    document.getElementById("morePillText").textContent = "+ More";
+    document.getElementById("morePillIcon").className = "fa-solid fa-chevron-down";
 
+    // All tags moved back to main row to measure
+    tags.forEach(el => {
+        el.style.display = "inline-flex";
+        bar.insertBefore(el, moreBtn);
+    });
+
+    const barWidth = bar.clientWidth - 28; // container width minus paddings
+    const moreBtnWidth = moreBtn.offsetWidth + 10; // button width with gap
+    let availableWidth = barWidth - moreBtnWidth;
+    let accumulatedWidth = 0;
+    let overflowElements = [];
+
+    // Check how many tags fit into availableWidth with gap
+    tags.forEach(tag => {
+        const tagWidth = tag.offsetWidth + 8; // pill width + gap
+        if (accumulatedWidth + tagWidth <= availableWidth) {
+            accumulatedWidth += tagWidth;
+        } else {
+            overflowElements.push(tag);
+        }
+    });
+
+    // Agar saare tags fit ho gaye toh More button ki zaroorat nahi
+    if (overflowElements.length === 0) {
+        moreBtn.style.display = "none";
+    } else {
+        // Extra tags ko hidden tray ke andar move kar do
+        overflowElements.forEach(tag => {
+            tray.appendChild(tag);
+        });
+    }
+}
+
+function toggleTagsTray() {
+    const tray = document.getElementById("overflowTray");
+    const text = document.getElementById("morePillText");
+    const icon = document.getElementById("morePillIcon");
+
+    isTrayOpen = !isTrayOpen;
+    if (isTrayOpen) {
+        tray.classList.add("open");
+        text.textContent = "Less";
+        icon.className = "fa-solid fa-chevron-up";
+    } else {
+        tray.classList.remove("open");
+        text.textContent = "+ More";
+        icon.className = "fa-solid fa-chevron-down";
+    }
+}
+
+// Initial triggers
+window.addEventListener("resize", arrangeMobileTags);
+document.addEventListener("DOMContentLoaded", arrangeMobileTags);
+window.addEventListener("load", arrangeMobileTags);
 </script>
 
 {% endblock %}

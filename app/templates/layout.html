@@ -401,10 +401,11 @@
     <ul class="navbar-nav mr-auto">
       <li class="nav-item active">
         <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/about">About us</a>
-      </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('chatbot_page') }}">
+                <i class="fa-solid fa-robot mr-1"></i> AI Assistant
+            </a>
+        </li>
       <li class="nav-item">
         <a class="nav-link" href="/supportus">Support us</a>
       </li>
@@ -415,6 +416,7 @@
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
           <a class="dropdown-item" href="/contact">Contact Us </a>
           <a class="dropdown-item" href="/account">View profile</a>
+          <a class="dropdown-item" href="/about">About us</a>
           <div class="dropdown-divider"></div>
           <a class="dropdown-item" href="https://h-24-gn7z.onrender.com/" target="_blank">H-24 Portal</a>
         </div>
@@ -461,15 +463,16 @@
         <div class="col-md-8">
             {% block content %}{% endblock %}
         </div>
-
+        
         <div class="col-md-4">
             <div class="card mb-3 shadow-sm">
                 <div class="card-header bg-primary text-white">Latest Posts</div>
                 <div class="list-group list-group-flush">
-                    <a href="#" class="list-group-item list-group-item-action">Python Tutorial</a>
-                    <a href="#" class="list-group-item list-group-item-action">Flask Basics</a>
-                    <a href="#" class="list-group-item list-group-item-action">Android App</a>
-                    <a href="#" class="list-group-item list-group-item-action">Cyber Security</a>
+                    <a href="{{ url_for('home', tag='Python') }}" class="list-group-item list-group-item-action">Python Tutorials</a>
+                    <a href="{{ url_for('home', tag='flask') }}" class="list-group-item list-group-item-action">Flask Basics</a>
+                    <a href="{{ url_for('home', tag='android app') }}" class="list-group-item list-group-item-action">Android App</a>
+                    <a href="{{ url_for('home', tag='cyber security') }}" class="list-group-item list-group-item-action">Cyber Security</a>
+                    <a href="{{ url_for('home', tag='leetcode') }}" class="list-group-item list-group-item-action">Leet Code</a>
                 </div>
             </div>
 
@@ -485,10 +488,10 @@
             <div class="card mb-3 shadow-sm">
                 <div class="card-header bg-dark text-white">Categories</div>
                 <div class="list-group list-group-flush">
-                    <a href="#" class="list-group-item">Python</a>
-                    <a href="#" class="list-group-item">Flask</a>
-                    <a href="#" class="list-group-item">Java</a>
-                    <a href="#" class="list-group-item">Android</a>
+                    <a href="{{ url_for('home', tag='Python') }}" class="list-group-item list-group-item-action">Python</a>
+                    <a href="{{ url_for('home', tag='Flask') }}" class="list-group-item list-group-item-action">Flask</a>
+                    <a href="{{ url_for('home', tag='Java') }}" class="list-group-item list-group-item-action">Java</a>
+                    <a href="{{ url_for('home', tag='Android') }}" class="list-group-item list-group-item-action">Android</a>
                 </div>
             </div>
 

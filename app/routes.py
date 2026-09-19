@@ -3,18 +3,36 @@ from flask import render_template , flash , url_for , redirect ,send_from_direct
 from app.forms import registration, LoginForm , UpdateProfile , createPost , UpdatePost ,OTPForm
 from app.models import  User ,Post , RequestLog
 from flask import request
-from flask_login import login_user , current_user , logout_user , login_required
+from flask_login import login_manager, login_user , current_user , logout_user , login_required
 import random
 import secrets
 import os
 import cloudinary.uploader
-from app.utils import refresh_home_cache , UserPostCaching , sendEmail , genrate_verifactionToken , verifyToken
 import logging
 from flask import abort
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask import request, jsonify
 from flask import make_response
+from app.utils import (
+    get_cached_posts, 
+    get_cached_tags, 
+    invalidate_post_caches, 
+    UserPostCaching, 
+    sendEmail, 
+    genrate_verifactionToken, 
+    verifyToken,
+    refresh_home_cache
+)
+
+import os
+from google import genai
+from google.genai import types
+from flask import render_template, request, jsonify
+import dotenv
+# Ensure .env is explicitly loaded
+dotenv.load_dotenv()
+
 #---------------------------------------------
 
 @app.route('/sitemap.xml')
@@ -74,6 +92,7 @@ def ratelimit_handler(e):
     return render_template("429.html"), 429
 #---------------------------------------------------------
 
+
 @app.route("/post/<int:post_id>")
 def post(post_id):
     post = Post.query.get_or_404(post_id)
@@ -115,33 +134,30 @@ def searchuser():
             return render_template('view_profile.html',title='profile',user=user,posts=posts,type = user.profile_type,profile_img=image)
     flash("User not found!", "danger")
     return redirect(url_for('home'))    
-@app.route("/post/<int:post_id>/update", methods=["GET","POST"])
+
+@app.route("/post/<int:post_id>/update", methods=["GET", "POST"])
 @login_required
 def postUpdate(post_id):
     post = Post.query.get_or_404(post_id)
     if post.author != current_user:
-            abort(403)
+        abort(403)
         
     form = UpdatePost()
 
     if form.validate_on_submit():
-
         post.title = form.title.data
         post.content = form.content.data
-        if not form.tag.data:
-            post.tag = "General"
-        else:
-            post.tag = form.tag.data    
+        post.tag = form.tag.data.strip() if form.tag.data else "General"
+        
         db.session.commit()
-        refresh_home_cache()
-        flash("Post Updated Successfully","success")
-
+        invalidate_post_caches()
+        flash("Post Updated Successfully", "success")
         return redirect(url_for("home", post_id=post.id))
 
     elif request.method == "GET":
-
         form.title.data = post.title
         form.content.data = post.content
+        form.tag.data = post.tag
 
     return render_template(
         "new_post.html",
@@ -149,14 +165,22 @@ def postUpdate(post_id):
         form=form,
         post=post
     )
+
 @app.route("/")
 def home():
-    posts = cache.get("latest_posts")
-    if posts is None:
-        refresh_home_cache()
-        posts = cache.get('latest_posts')
-    return render_template("index.html",posts = posts, title = "Home page")
+    selected_tag = request.args.get("tag", "").strip()
+    selected_tag = selected_tag if selected_tag else None
 
+    posts = get_cached_posts(tag=selected_tag)
+    tags = get_cached_tags()
+
+    return render_template(
+        "index.html",
+        posts=posts,
+        tags=tags,
+        selected_tag=selected_tag,
+        title="Home page"
+    )
 @app.route("/about")
 def about():
     return render_template("about.html")
@@ -240,7 +264,9 @@ def save_img(form_img):
     ) 
     
     return response
+
 @app.route('/upload-image', methods=['POST'])
+@login_required
 def upload_image():
 
     MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB
@@ -348,27 +374,29 @@ def inject_profile():
 
     return dict(profile_image=image)
 
-@app.route('/post/new',methods = ["POST","GET"])
+@app.route('/post/new', methods=["POST", "GET"])
 @login_required
 def new_post():
-    if current_user.is_verified == False:
-        flash("Verify Your Email First !",'danger')
+    if not current_user.is_verified:
+        flash("Verify Your Email First !", 'danger')
         return redirect(url_for('account'))
     form = createPost()
 
     if form.validate_on_submit():
-        post  = Post(
-            title = form.title.data,
+        post = Post(
+            title=form.title.data,
             content=form.content.data,
-            author= current_user
+            tag=form.tag.data.strip() if form.tag.data else "General",
+            author=current_user
         )    
         db.session.add(post)
         db.session.commit()
         flash("Post Created Successfully!", "success")
-        refresh_home_cache()
+        invalidate_post_caches()
         return redirect(url_for("home"))
 
-    return render_template('new_post.html',title="POST",form=form)
+    return render_template('new_post.html', title="POST", form=form)
+
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from flask import current_app, render_template, redirect, url_for, flash
 
@@ -435,3 +463,45 @@ def helth():
 @app.route('/glob')
 def glob():
     return render_template('glob.html')
+
+API_KEY = os.getenv("GEMINI_API_KEY")
+
+
+gemini_client = genai.Client(api_key=API_KEY)
+
+
+@app.route("/chatbot")
+def chatbot_page():
+    return render_template("chatbot.html", title="H-24 AI Assistant")
+
+
+@app.route("/api/chat", methods=["POST"])
+@login_required
+@limiter.limit("10 per day")
+def chat_api():
+    data = request.get_json() or {}
+    user_prompt = data.get("prompt", "").strip()
+
+    # 1. Validation: Prompt empty check
+    if not user_prompt:
+        return jsonify({"error": "Prompt cannot be empty."}), 400
+
+    # 2. Validation: Strict 40 characters limit
+    if len(user_prompt) > 40:
+        return jsonify({
+            "error": f"Prompt length exceeds limit! Max 40 characters allowed. (Current: {len(user_prompt)})"
+        }), 400
+
+    try:
+        # Dummy script wala exact interaction endpoint
+        interaction = gemini_client.interactions.create(
+            model="gemini-3.8-flash",
+            input=f"Answer strictly in 1-2 short sentences: {user_prompt}"
+        )
+        
+        reply_text = interaction.output_text.strip()
+        return jsonify({"reply": reply_text})
+
+    except Exception as e:
+        print("Gemini API Error:", e)
+        return jsonify({"error": "Failed to generate response. Please try again later."}), 500

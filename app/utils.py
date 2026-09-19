@@ -1,5 +1,6 @@
-from app import cache
+from app import cache , db
 from app.models import Post
+from sqlalchemy import func
 from sqlalchemy.orm import joinedload
 
 import os
@@ -22,6 +23,55 @@ from reportlab.lib import colors
 from sib_api_v3_sdk import TransactionalEmailsApi, ApiClient, SendSmtpEmail, Configuration
 
 
+def get_cached_tags():
+    """Returns a cached list of unique tags currently used in posts."""
+    tags = cache.get("available_tags")
+    if tags is None:
+        # Fetch distinct non-null tags from the database
+        results = (
+            db.session.query(Post.tag)
+            .filter(Post.tag.isnot(None), Post.tag != "")
+            .distinct()
+            .all()
+        )
+        tags = sorted([r[0] for r in results])
+        cache.set("available_tags", tags, timeout=3600)
+    return tags
+
+def get_cached_posts(tag=None, limit=10):
+    """Fetches filtered posts from cache, falls back to DB query, and sets cache."""
+    normalized_tag = tag.strip() if tag else None
+    cache_key = f"posts_tag_{normalized_tag.lower()}" if normalized_tag else "posts_tag_all"
+    
+    posts = cache.get(cache_key)
+    if posts is None:
+        query = (
+            Post.query
+            .options(joinedload(Post.author))
+            .order_by(Post.date_posted.desc())
+        )
+        if normalized_tag:
+            query = query.filter(func.lower(Post.tag) == normalized_tag.lower())
+
+        posts = query.limit(limit).all()
+        # Cache for 1 hour (3600 seconds)
+        cache.set(cache_key, posts, timeout=3600)
+        
+        # Track generated tag keys in a set to selectively invalidate them later
+        known_keys = cache.get("tracked_post_cache_keys") or set()
+        if cache_key not in known_keys:
+            known_keys.add(cache_key)
+            cache.set("tracked_post_cache_keys", known_keys, timeout=86400)
+
+    return posts
+def invalidate_post_caches():
+    """Clears all dynamic tag caches and the tag list when a post is created/updated."""
+    known_keys = cache.get("tracked_post_cache_keys") or set()
+    for key in known_keys:
+        cache.delete(key)
+    cache.delete("posts_tag_all")
+    cache.delete("available_tags")
+    cache.delete("tracked_post_cache_keys")
 
 def refresh_home_cache():
     latest_posts = (
