@@ -1,6 +1,7 @@
+from venv import logger
 from app import app , db , bcrypt , cache
 from flask import render_template , flash , url_for , redirect ,send_from_directory
-from app.forms import registration, LoginForm , UpdateProfile , createPost , UpdatePost ,OTPForm
+from app.forms import FeedbackForm, registration, LoginForm , UpdateProfile , createPost , UpdatePost ,OTPForm , FeedbackForm
 from app.models import  User ,Post , RequestLog
 from flask import request
 from flask_login import login_manager, login_user , current_user , logout_user , login_required
@@ -22,7 +23,8 @@ from app.utils import (
     sendEmail, 
     genrate_verifactionToken, 
     verifyToken,
-    refresh_home_cache
+    # refresh_home_cache,
+    send_feedback_email
 )
 
 import os
@@ -30,6 +32,7 @@ from google import genai
 from google.genai import types
 from flask import render_template, request, jsonify
 import dotenv
+# import time 
 # Ensure .env is explicitly loaded
 dotenv.load_dotenv()
 
@@ -101,9 +104,9 @@ def post(post_id):
 @app.after_request
 def log_request(response):
     ip = request.headers.get("X-Forwarded-For", request.remote_addr)
-    print(ip)
-    
-    print(
+    logger.info(f"Request from {ip}")
+
+    logger.info(
         f"[H-24] {request.remote_addr} | "
         f"{request.method} | "
         f"{request.path} | "
@@ -130,7 +133,7 @@ def searchuser():
                     )
             else:
                     image = user.image_file
-            print(image )
+            logger.info(f"Profile image for {user.username}: {image}")
             return render_template('view_profile.html',title='profile',user=user,posts=posts,type = user.profile_type,profile_img=image)
     flash("User not found!", "danger")
     return redirect(url_for('home'))    
@@ -165,22 +168,48 @@ def postUpdate(post_id):
         form=form,
         post=post
     )
+@app.route("/feedback", methods=["POST", "GET"])
+@login_required
+def feedback():
 
+    form = FeedbackForm()
+
+    if form.validate_on_submit():
+        feedback_data  = [
+            current_user.username,
+            current_user.email,
+            form.feedback.data
+        ]
+        send_feedback_email(feedback_data)
+        # Process feedback
+        flash("Feedback submitted successfully!", "success")
+
+    else:
+        logger.error(f"FORM ERRORS: {form.errors}") 
+        flash("Failed to submit feedback.", "danger")
+
+    return redirect(url_for("home"))
 @app.route("/")
 def home():
+
+
     selected_tag = request.args.get("tag", "").strip()
     selected_tag = selected_tag if selected_tag else None
-
+    
     posts = get_cached_posts(tag=selected_tag)
+    
     tags = get_cached_tags()
-
+    
     return render_template(
         "index.html",
         posts=posts,
+        form=FeedbackForm(),
         tags=tags,
         selected_tag=selected_tag,
         title="Home page"
     )
+
+
 @app.route("/about")
 def about():
     return render_template("about.html")
@@ -236,12 +265,12 @@ def register():
             
         except Exception as e:
             db.session.rollback()  
-            print(f"Database/Registration Error: {e}")
+            logger.error(f"Database/Registration Error: {e}")
             flash(f"Error: {e}", "danger")
             
     elif request.method == "POST":
         
-        print("Form Errors:", form.errors)
+        logger.error(f"Form Errors: {form.errors}")
         flash("Something went wrong while creating your account. Check form fields.", "danger")
  
     return render_template("register.html", title="Registration", form=form)
@@ -442,11 +471,12 @@ def add_security_headers(response):
     response.headers['Content-Security-Policy'] = "frame-ancestors 'self'"
     return response
 
+# future: Add a route for 2FA verification and support page
 @app.route('/2fa')
 def Twofa():
     form = OTPForm()
     if form.validate_on_submit():
-        print(form.otp.data)
+        logger.info(f"2FA Code submitted for user {current_user.username}: {form.otp.data}")
     return render_template('2fa.html',form=form)
 
 @app.route('/supportus')
@@ -469,7 +499,7 @@ API_KEY = os.getenv("GEMINI_API_KEY")
 
 gemini_client = genai.Client(api_key=API_KEY)
 
-
+@login_required
 @app.route("/chatbot")
 def chatbot_page():
     return render_template("chatbot.html", title="H-24 AI Assistant")
@@ -493,7 +523,6 @@ def chat_api():
         }), 400
 
     try:
-        # Dummy script wala exact interaction endpoint
         interaction = gemini_client.interactions.create(
             model="gemini-3.8-flash",
             input=f"Answer strictly in 1-2 short sentences: {user_prompt}"
@@ -503,5 +532,5 @@ def chat_api():
         return jsonify({"reply": reply_text})
 
     except Exception as e:
-        print("Gemini API Error:", e)
+        logger.error(f"Gemini API Error: {e}")
         return jsonify({"error": "Failed to generate response. Please try again later."}), 500

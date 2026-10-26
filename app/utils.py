@@ -21,8 +21,8 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
 from sib_api_v3_sdk import TransactionalEmailsApi, ApiClient, SendSmtpEmail, Configuration
-
-
+import time
+from app import logger
 def get_cached_tags():
     """Returns a cached list of unique tags currently used in posts."""
     tags = cache.get("available_tags")
@@ -37,31 +37,40 @@ def get_cached_tags():
         tags = sorted([r[0] for r in results])
         cache.set("available_tags", tags, timeout=3600)
     return tags
-
 def get_cached_posts(tag=None, limit=10):
-    """Fetches filtered posts from cache, falls back to DB query, and sets cache."""
-    normalized_tag = tag.strip() if tag else None
-    cache_key = f"posts_tag_{normalized_tag.lower()}" if normalized_tag else "posts_tag_all"
-    
-    posts = cache.get(cache_key)
-    if posts is None:
-        query = (
-            Post.query
-            .options(joinedload(Post.author))
-            .order_by(Post.date_posted.desc())
-        )
-        if normalized_tag:
-            query = query.filter(func.lower(Post.tag) == normalized_tag.lower())
 
-        posts = query.limit(limit).all()
-        # Cache for 1 hour (3600 seconds)
-        cache.set(cache_key, posts, timeout=3600)
-        
-        # Track generated tag keys in a set to selectively invalidate them later
-        known_keys = cache.get("tracked_post_cache_keys") or set()
-        if cache_key not in known_keys:
-            known_keys.add(cache_key)
-            cache.set("tracked_post_cache_keys", known_keys, timeout=86400)
+    normalized_tag = tag.strip() if tag else None
+
+    cache_key = (
+        f"posts_tag_{normalized_tag.lower()}"
+        if normalized_tag
+        else "posts_tag_all"
+    )
+
+    posts = cache.get(cache_key)
+
+    if posts is not None:
+        return posts
+
+    
+
+    start = time.perf_counter()
+
+    query = (
+        Post.query
+        .options(joinedload(Post.author))
+        .order_by(Post.date_posted.desc())
+    )
+
+    if normalized_tag:
+        query = query.filter(
+            func.lower(Post.tag) == normalized_tag.lower()
+        )
+
+    posts = query.limit(limit).all()
+
+
+    cache.set(cache_key, posts, timeout=3600)
 
     return posts
 def invalidate_post_caches():
@@ -222,10 +231,10 @@ style="background:#f8fafc;padding:25px;">
 
     try:
         response = api_instance.send_transac_email(send_smtp_email)
-        print("Email Sent Successfully!")
+        logger.info("Feedback email sent successfully")
         return True
     except Exception as e:
-        print("Error:", e)
+        logger.error(f"Error sending feedback email: {e}")
         return False
 
 SECRET_KEY =  os.getenv('SECRET_KEY')
@@ -245,7 +254,7 @@ def verifyToken(token,expiration=1500):
         )
         return email
     except Exception as e:
-        print(f'Token Error {e}')
+        logger.error(f"Token Error: {e}")
         return None
 
 
@@ -348,8 +357,76 @@ def send_logs_pdf_email(pdf_buffer, total_logs_count):
 
     try:
         api_instance.send_transac_email(send_smtp_email)
-        print("Backup Email with PDF Sent Successfully!")
+        logger.info("Backup Email with PDF Sent Successfully!")
         return True
     except Exception as e:
-        print("Error sending email:", e)
+        logger.error(f"Error sending backup email: {e}")
+        return False
+def send_feedback_email(feedback_data):
+    api_instance = TransactionalEmailsApi(ApiClient(configuration))
+
+    try:
+        send_smtp_email = SendSmtpEmail(
+            sender={
+                "name": "H-24 Blog",
+                "email": "dhhardik242008@gmail.com"
+            },
+            to=[
+                {
+                    "email": "hardikprajapati242008@gmail.com",
+                    "name": "H-24 Blog App"
+                }
+            ],
+            subject=f"Feedback from {feedback_data[0]} ({feedback_data[1]})",
+            html_content=f"""
+            <!DOCTYPE html>
+            <html>
+            <body style="font-family: Arial, sans-serif; background-color: #f4f7fb; padding: 20px;">
+                <div style="max-width: 600px; background: #ffffff; padding: 25px;
+                            border-radius: 8px; border: 1px solid #e2e8f0;">
+
+                    <h2 style="color: #1e293b; margin-top: 0;">
+                        Feedback Received
+                    </h2>
+
+                    <p style="color: #475569;">Hello Admin,</p>
+
+                    <p style="color: #475569;">
+                        You have received feedback from
+                        <b>{feedback_data[0]}</b>
+                        ({feedback_data[1]}).
+                    </p>
+
+                    <p style="color: #475569;">
+                        <b>Feedback:</b>
+                    </p>
+
+                    <p style="color: #475569;">
+                        {feedback_data[2]}
+                    </p>
+
+                    <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;">
+
+                    <p style="font-size: 12px; color: #94a3b8;">
+                        Timestamp:
+                        {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC
+                    </p>
+
+                </div>
+            </body>
+            </html>
+            """
+        )
+
+        logger.info("Sending feedback email...")
+
+        response = api_instance.send_transac_email(send_smtp_email)
+
+        logger.info("Feedback email sent successfully!")
+        logger.info(f"Brevo response: {response}")
+
+        return True
+
+    except Exception as e:
+        logger.error(f"Error preparing feedback email: {e}")
         return False

@@ -307,6 +307,327 @@ html.dark-mode .filter-pill {
 
 html.dark-mode .overflow-tags-tray {
     border-top-color: rgba(255, 255, 255, 0.1);
+}/* =========================
+   Feedback Launcher
+   ========================= */
+
+.feedback-launcher {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 25px;
+    margin-bottom: 10px;
+}
+
+.feedback-main-btn {
+    border: none;
+    border-radius: 50px;
+    padding: 10px 18px;
+    background: linear-gradient(135deg, #0d6efd, #00c6ff);
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 5px 18px rgba(13, 110, 253, .25);
+    transition: all .25s ease;
+}
+
+.feedback-main-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(13, 110, 253, .35);
+}
+
+.feedback-main-btn i {
+    margin-right: 6px;
+}
+
+
+/* =========================
+   Feedback Modal
+   ========================= */
+
+.feedback-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(0, 0, 0, .55);
+    backdrop-filter: blur(7px);
+
+    opacity: 0;
+    transition: opacity .25s ease;
+}
+
+.feedback-modal.show {
+    display: flex;
+    opacity: 1;
+}
+
+
+/* Card */
+
+.feedback-modal-card {
+    width: 100%;
+    max-width: 520px;
+
+    background: #fff;
+    border-radius: 22px;
+
+    box-shadow:
+        0 25px 70px rgba(0, 0, 0, .25);
+
+    overflow: hidden;
+
+    transform: translateY(20px) scale(.97);
+    transition: transform .3s ease;
+
+    animation: feedbackModalIn .3s ease forwards;
+}
+
+@keyframes feedbackModalIn {
+
+    from {
+        opacity: 0;
+        transform: translateY(25px) scale(.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+
+/* Header */
+
+.feedback-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 20px 22px;
+
+    border-bottom: 1px solid #eee;
+}
+
+.feedback-modal-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.feedback-modal-icon {
+    width: 45px;
+    height: 45px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 13px;
+
+    background: linear-gradient(
+        135deg,
+        #0d6efd,
+        #00c6ff
+    );
+
+    color: white;
+    font-size: 18px;
+
+    box-shadow:
+        0 5px 15px rgba(13, 110, 253, .25);
+}
+
+.feedback-modal-title h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.feedback-modal-title p {
+    margin: 3px 0 0;
+    font-size: .8rem;
+    color: #6c757d;
+}
+
+
+/* Close */
+
+.feedback-close-btn {
+    width: 35px;
+    height: 35px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #f1f3f5;
+    color: #495057;
+
+    cursor: pointer;
+
+    transition: all .2s ease;
+}
+
+.feedback-close-btn:hover {
+    background: #e9ecef;
+    transform: rotate(90deg);
+}
+
+
+/* Form */
+
+.feedback-modal-form {
+    padding: 22px;
+}
+
+.feedback-field {
+    margin-bottom: 17px;
+}
+
+.feedback-field label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    font-size: .85rem;
+    font-weight: 600;
+}
+
+.feedback-field label i {
+    margin-right: 5px;
+    color: #0d6efd;
+}
+
+.feedback-field input,
+.feedback-field textarea {
+    width: 100%;
+
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+
+    padding: 11px 13px;
+
+    font-size: .9rem;
+
+    outline: none;
+
+    transition: all .2s ease;
+}
+
+.feedback-field input:focus,
+.feedback-field textarea:focus {
+    border-color: #0d6efd;
+
+    box-shadow:
+        0 0 0 3px rgba(13, 110, 253, .1);
+}
+
+.feedback-field input[readonly] {
+    background: #f8f9fa;
+    cursor: not-allowed;
+}
+
+.feedback-field textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+
+/* Counter */
+
+.feedback-counter {
+    display: flex;
+    justify-content: space-between;
+
+    margin-top: 5px;
+
+    font-size: .72rem;
+    color: #8a8f98;
+}
+
+
+/* Actions */
+
+.feedback-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 9px;
+
+    margin-top: 20px;
+}
+
+.feedback-cancel-btn,
+.feedback-submit-btn {
+    border: none;
+    border-radius: 50px;
+
+    padding: 9px 17px;
+
+    font-weight: 600;
+    cursor: pointer;
+
+    transition: all .2s ease;
+}
+
+.feedback-cancel-btn {
+    background: #f1f3f5;
+    color: #495057;
+}
+
+.feedback-submit-btn {
+    color: white;
+
+    background:
+        linear-gradient(
+            135deg,
+            #0d6efd,
+            #00a8ff
+        );
+}
+
+.feedback-submit-btn:hover,
+.feedback-cancel-btn:hover {
+    transform: translateY(-1px);
+}
+
+
+/* =========================
+   Dark Mode
+   ========================= */
+
+html.dark-mode .feedback-modal-card {
+    background: #1e1e1f;
+    color: #e2e8f0;
+}
+
+html.dark-mode .feedback-modal-header {
+    border-color: #343438;
+}
+
+html.dark-mode .feedback-modal-title p {
+    color: #9ca3af;
+}
+
+html.dark-mode .feedback-close-btn,
+html.dark-mode .feedback-cancel-btn {
+    background: #2b2b2e;
+    color: #e2e8f0;
+}
+
+html.dark-mode .feedback-field input,
+html.dark-mode .feedback-field textarea {
+    background: #252526;
+    color: #e2e8f0;
+    border-color: #3f3f46;
+}
+
+html.dark-mode .feedback-field input[readonly] {
+    background: #202023;
 }
 </style><!-- Tag Filter Section -->
 <div class="tag-filter-wrapper">
@@ -422,7 +743,149 @@ html.dark-mode .overflow-tags-tray {
         </div>
     </div>
 {% endif %}
+<!-- =========================
+     Feedback Button
+     ========================= -->
 
+<div class="feedback-launcher">
+    <button
+        type="button"
+        class="feedback-main-btn"
+        onclick="openFeedbackModal()">
+
+        <i class="fa-solid fa-comment-dots"></i>
+        Feedback
+    </button>
+</div>
+
+
+<!-- =========================
+     Feedback Modal
+     ========================= -->
+
+<div
+    class="feedback-modal"
+    id="feedbackModal"
+    onclick="handleFeedbackOverlay(event)">
+
+    <div class="feedback-modal-card">
+
+        <!-- Header -->
+        <div class="feedback-modal-header">
+
+            <div class="feedback-modal-title">
+                <div class="feedback-modal-icon">
+                    <i class="fa-solid fa-comment-dots"></i>
+                </div>
+
+                <div>
+                    <h4>Share Your Feedback</h4>
+                    <p>We'd love to hear what you think.</p>
+                </div>
+            </div>
+
+            <button
+                type="button"
+                class="feedback-close-btn"
+                onclick="closeFeedbackModal()"
+                aria-label="Close">
+
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+        </div>
+
+
+        <!-- Form -->
+        <form
+            method="POST"
+            action="{{ url_for('feedback') }}"
+            class="feedback-modal-form">
+
+            {{ form.hidden_tag() }}
+
+            <!-- Username -->
+            <div class="feedback-field">
+
+                <label for="feedbackUsername">
+                    <i class="fa-solid fa-user"></i>
+                    Username
+                </label>
+
+                <input
+                    type="text"
+                    id="feedbackUsername"
+                    name="username"
+                    value="{{ current_user.username }}"
+                    readonly>
+            </div>
+
+
+            <!-- Email -->
+            <div class="feedback-field">
+
+                <label for="feedbackEmail">
+                    <i class="fa-solid fa-envelope"></i>
+                    Email
+                </label>
+
+                <input
+                    type="email"
+                    id="feedbackEmail"
+                    name="email"
+                    value="{{ current_user.email }}"
+                    readonly>
+            </div>
+
+
+            <!-- Feedback -->
+            <div class="feedback-field">
+
+                <label for="feedbackMessage">
+                    <i class="fa-solid fa-message"></i>
+                    Your Feedback
+                </label>
+
+                <textarea
+                    id="feedbackMessage"
+                    name="feedback"
+                    rows="5"
+                    maxlength="1000"
+                    placeholder="Tell us what you think..."
+                    required></textarea>
+
+                <div class="feedback-counter">
+                    <span>Maximum 1000 characters</span>
+                    <span id="feedbackCharCount">0/1000</span>
+                </div>
+
+            </div>
+
+
+            <!-- Actions -->
+            <div class="feedback-modal-actions">
+
+                <button
+                    type="button"
+                    class="feedback-cancel-btn"
+                    onclick="closeFeedbackModal()">
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="feedback-submit-btn">
+
+                    <i class="fa-solid fa-paper-plane"></i>
+                    Send Feedback
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
 <script>
 function evaluatePostClamping() {
     document.querySelectorAll(".post-content").forEach(function(post) {
@@ -553,6 +1016,84 @@ function toggleTagsTray() {
 window.addEventListener("resize", arrangeMobileTags);
 document.addEventListener("DOMContentLoaded", arrangeMobileTags);
 window.addEventListener("load", arrangeMobileTags);
+/* =========================
+   Feedback Modal
+   ========================= */
+
+function openFeedbackModal() {
+
+    const modal = document.getElementById("feedbackModal");
+
+    if (!modal) return;
+
+    modal.classList.add("show");
+
+    document.body.style.overflow = "hidden";
+
+    setTimeout(() => {
+
+        const textarea =
+            document.getElementById("feedbackMessage");
+
+        if (textarea) {
+            textarea.focus();
+        }
+
+    }, 250);
+}
+
+
+function closeFeedbackModal() {
+
+    const modal = document.getElementById("feedbackModal");
+
+    if (!modal) return;
+
+    modal.classList.remove("show");
+
+    document.body.style.overflow = "";
+}
+
+
+function handleFeedbackOverlay(event) {
+
+    if (event.target.id === "feedbackModal") {
+        closeFeedbackModal();
+    }
+}
+
+
+/* Character Counter */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const textarea =
+        document.getElementById("feedbackMessage");
+
+    const counter =
+        document.getElementById("feedbackCharCount");
+
+    if (!textarea || !counter) return;
+    textarea.addEventListener("input", function () {
+
+        counter.textContent =
+            `${this.value.length}/1000`;
+
+    });
+
+});
+
+
+/* ESC = Close */
+
+document.addEventListener("keydown", function (event) {
+
+    if (event.key === "Escape") {
+        closeFeedbackModal();
+    }
+
+});
+
 </script>
 
 {% endblock %}

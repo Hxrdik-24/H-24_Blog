@@ -11,6 +11,9 @@ from flask_login import AnonymousUserMixin
 from sib_api_v3_sdk import (
     Configuration
 )
+import logging
+
+logger = logging.getLogger(__name__)
 #from sqlalchemy.orm import DeclarativeBase
 dotenv.load_dotenv()
 

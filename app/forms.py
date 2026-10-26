@@ -80,3 +80,9 @@ class OTPForm(FlaskForm):
     )
 
     submit = SubmitField("Verify")
+
+class FeedbackForm(FlaskForm):
+    username = StringField("Username", validators=[DataRequired(), Length(min=2, max=10)])
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    feedback = StringField("Feedback", validators=[DataRequired(), Length(min=1, max=500)])
+    submit = SubmitField("Submit Feedback")

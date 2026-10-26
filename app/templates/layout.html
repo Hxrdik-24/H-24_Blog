@@ -90,6 +90,520 @@
             color: var(--text-color) !important;
         }
 
+        /* =====================================================
+           H-24 Navbar — premium tech-blog redesign
+           (scoped to .h24-navbar; works in light + dark mode)
+           ===================================================== */
+        .navbar.h24-navbar {
+            /* ---- LIGHT: silver surface, light gold details, soft black shadows,
+                         light-neon blue → light-neon rose gradient with white shine ---- */
+            --nb-bg: rgba(255, 255, 255, 0.92);
+            --nb-bg-img: linear-gradient(180deg, rgba(255, 255, 255, 0.97) 0%, rgba(228, 232, 238, 0.92) 100%);
+            --nb-text: #30343b;
+            --nb-strong: #14171c;
+            --nb-muted: #6b7280;
+            --nb-accent: #0e7490;
+            --nb-focus: #0891b2;
+            --nb-accent-line: #5ee7ff;
+            --nb-accent-soft: rgba(94, 231, 255, 0.2);
+            --nb-rule: rgba(94, 231, 255, 0.7);
+            --nb-rose: #e0307a;
+            --nb-rose-soft: rgba(255, 142, 196, 0.22);
+            --nb-gold: #d9b84f;
+            --nb-gold-soft: rgba(226, 190, 90, 0.2);
+            --nb-gold-ink: #8a6d15;
+            --nb-hl: #d9b84f;
+            --nb-hl-soft: rgba(226, 190, 90, 0.2);
+            --nb-hl-ink: #8a6d15;
+            --nb-label: #8a6d15;
+            --nb-active-ring: rgba(217, 184, 79, 0.55);
+            --nb-grad: linear-gradient(90deg, #5ee7ff, #ff8ec4);
+            --nb-grad-text: linear-gradient(90deg, #0891b2, #e0307a);
+            --nb-soft-grad: linear-gradient(90deg, rgba(94, 231, 255, 0.26), rgba(255, 255, 255, 0.5) 50%, rgba(255, 142, 196, 0.24));
+            --nb-line-grad: linear-gradient(90deg, transparent, #5ee7ff 22%, #efd58a 50%, #ff8ec4 78%, transparent);
+            --nb-hover: rgba(0, 0, 0, 0.05);
+            --nb-field: #ffffff;
+            --nb-border: #cfd4dc;
+            --nb-menu-bg: #ffffff;
+            --nb-shadow: 0 14px 36px rgba(0, 0, 0, 0.14), 0 2px 6px rgba(0, 0, 0, 0.06);
+            --nb-nav-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+            --nb-btn-bg-img: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 58%), linear-gradient(135deg, #5ee7ff, #ff8ec4);
+            --nb-btn-text: #0f172a;
+            --nb-btn-shadow: 0 4px 14px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            --nb-btn-shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            --nb-danger: #b91c1c;
+            --nb-danger-soft: rgba(220, 38, 38, 0.1);
+            --nb-h: 2.375rem;
+
+            z-index: 1030;
+            padding: 0.5rem max(1rem, calc((100% - 1320px) / 2));
+            font-size: 0.95rem;
+            background-color: var(--nb-bg) !important;
+            background-image: var(--nb-bg-img);
+            -webkit-backdrop-filter: saturate(160%) blur(12px);
+            backdrop-filter: saturate(160%) blur(12px);
+            border-bottom: 1px solid var(--nb-border);
+            box-shadow: var(--nb-nav-shadow);
+        }
+
+        html.dark-mode .navbar.h24-navbar {
+            --nb-bg: rgba(24, 24, 24, 0.88);
+            --nb-bg-img: none;
+            --nb-text: #cbd5e1;
+            --nb-strong: #f1f5f9;
+            --nb-muted: #94a3b8;
+            --nb-accent: #22d3ee;
+            --nb-focus: #22d3ee;
+            --nb-accent-line: #22d3ee;
+            --nb-accent-soft: rgba(34, 211, 238, 0.14);
+            --nb-rule: rgba(34, 211, 238, 0.4);
+            --nb-rose: #ff4d9d;
+            --nb-rose-soft: rgba(255, 77, 157, 0.16);
+            --nb-hl: #ff4d9d;
+            --nb-hl-soft: rgba(255, 77, 157, 0.16);
+            --nb-hl-ink: #ff4d9d;
+            --nb-label: #94a3b8;
+            --nb-active-ring: transparent;
+            --nb-grad: linear-gradient(90deg, #22d3ee, #ff4d9d);
+            --nb-grad-text: linear-gradient(90deg, #22d3ee, #ff4d9d);
+            --nb-soft-grad: linear-gradient(90deg, rgba(34, 211, 238, 0.16), rgba(255, 77, 157, 0.16));
+            --nb-line-grad: linear-gradient(90deg, transparent, #22d3ee 30%, #ff4d9d 70%, transparent);
+            --nb-hover: rgba(255, 255, 255, 0.07);
+            --nb-field: rgba(255, 255, 255, 0.06);
+            --nb-border: #333333;
+            --nb-menu-bg: #1f1f1f;
+            --nb-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+            --nb-nav-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+            --nb-btn-bg-img: linear-gradient(135deg, #22d3ee, #ff4d9d);
+            --nb-btn-text: #1a0612;
+            --nb-btn-shadow: 0 4px 14px rgba(255, 46, 136, 0.25);
+            --nb-btn-shadow-hover: 0 6px 18px rgba(255, 46, 136, 0.35);
+            --nb-danger: #f87171;
+            --nb-danger-soft: rgba(248, 113, 113, 0.14);
+        }
+
+        /* Thin gradient accent line along the bottom edge */
+        .navbar.h24-navbar::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -1px;
+            height: 1px;
+            pointer-events: none;
+            background: var(--nb-line-grad);
+            opacity: 0.85;
+        }
+
+        .h24-navbar a,
+        .h24-navbar a:hover { text-decoration: none; }
+
+        /* --- Focus states (keyboard only) --- */
+        .h24-navbar button:focus { outline: 0; }
+        .h24-navbar a:focus-visible,
+        .h24-navbar button:focus-visible {
+            outline: 2px solid var(--nb-focus);
+            outline-offset: 2px;
+        }
+        .h24-navbar .dropdown-item:focus-visible { outline-offset: -2px; }
+        @supports not selector(:focus-visible) {
+            .h24-navbar button:focus,
+            .h24-navbar a:focus { outline: 2px solid var(--nb-focus); outline-offset: 2px; }
+        }
+
+        .h24-skip-link {
+            position: absolute;
+            left: 1rem;
+            top: -100px;
+            z-index: 100000;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            background: #0e7490;
+            color: #ffffff;
+            font-weight: 600;
+            transition: top 0.15s ease;
+        }
+        .h24-skip-link:focus { top: 0.75rem; color: #ffffff; text-decoration: none; }
+        #main-content:focus { outline: 0; }
+
+        /* --- Brand --- */
+        .h24-navbar .navbar-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin: 0 1rem 0 0;
+            padding: 0.25rem 0;
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            line-height: 1;
+            color: var(--nb-strong) !important;
+        }
+        .h24-navbar .navbar-brand img {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            object-fit: contain;
+            transition: transform 0.25s ease;
+        }
+        .h24-navbar .navbar-brand:hover img { transform: rotate(-6deg) scale(1.06); }
+        .h24-brand-accent {
+            color: var(--nb-accent);
+            background: var(--nb-grad-text);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* --- Hamburger toggler --- */
+        .h24-navbar .h24-toggler {
+            /* display is set only in the < 992px media query so Bootstrap's
+               navbar-expand-lg can hide it on desktop */
+            align-items: center;
+            justify-content: center;
+            width: var(--nb-h);
+            height: var(--nb-h);
+            padding: 0;
+            border: 1px solid var(--nb-border);
+            border-radius: 10px;
+            background: transparent;
+            color: var(--nb-text);
+            font-size: 1.05rem;
+            transition: border-color 0.18s ease, color 0.18s ease, background-color 0.18s ease;
+        }
+        .h24-navbar .h24-toggler:hover { border-color: var(--nb-hl); color: var(--nb-hl-ink); background: var(--nb-hl-soft); }
+        .h24-navbar .h24-toggler .h24-toggler-close { display: none; }
+        .h24-navbar .h24-toggler[aria-expanded="true"] .h24-toggler-open { display: none; }
+        .h24-navbar .h24-toggler[aria-expanded="true"] .h24-toggler-close { display: inline-block; }
+
+        /* --- Primary navigation links --- */
+        .h24-navbar .h24-primary { gap: 0.125rem; }
+        .h24-navbar .h24-primary .nav-link {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.8rem;
+            border: 0;
+            border-radius: 10px;
+            background: transparent;
+            font: inherit;
+            font-weight: 500;
+            white-space: nowrap;
+            cursor: pointer;
+            color: var(--nb-text) !important;
+            transition: background-color 0.18s ease, color 0.18s ease;
+        }
+        .h24-navbar .nav-ico {
+            width: 1.1em;
+            text-align: center;
+            font-size: 0.9em;
+            color: var(--nb-muted);
+            transition: color 0.18s ease, transform 0.18s ease;
+        }
+        .h24-navbar .h24-primary .nav-link:hover,
+        .h24-navbar .h24-primary .nav-item.show > .nav-link {
+            background: var(--nb-hover);
+            color: var(--nb-strong) !important;
+        }
+        .h24-navbar .h24-primary .nav-link:hover .nav-ico,
+        .h24-navbar .h24-primary .nav-item.show > .nav-link .nav-ico {
+            color: var(--nb-rose);
+            transform: translateY(-1px);
+        }
+        .h24-navbar .h24-primary .nav-link.active {
+            background: var(--nb-soft-grad);
+            box-shadow: inset 0 0 0 1px var(--nb-active-ring);
+            color: var(--nb-accent) !important;
+        }
+        .h24-navbar .h24-primary .nav-link.active .nav-ico { color: var(--nb-accent); }
+
+        .h24-navbar .dropdown-toggle::after {
+            margin-left: 0.25rem;
+            vertical-align: 0;
+            opacity: 0.7;
+            transition: transform 0.2s ease;
+        }
+        .h24-navbar .show > .dropdown-toggle::after { transform: rotate(180deg); }
+
+        /* --- Dropdown menus (readable in light + dark) --- */
+        .h24-navbar .dropdown-menu {
+            min-width: 14rem;
+            margin-top: 0.5rem;
+            padding: 0.4rem;
+            border: 1px solid var(--nb-border);
+            border-radius: 12px;
+            background-color: var(--nb-menu-bg);
+            color: var(--nb-text);
+            box-shadow: var(--nb-shadow);
+        }
+        .h24-navbar .dropdown-header {
+            padding: 0.4rem 0.75rem 0.3rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--nb-label);
+        }
+        .h24-navbar .dropdown-divider { margin: 0.35rem 0; border-top-color: var(--nb-border); }
+        .h24-navbar .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 0.55rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.92rem;
+            font-weight: 500;
+            color: var(--nb-text);
+            transition: background-color 0.15s ease, color 0.15s ease;
+        }
+        .h24-navbar .dropdown-item i {
+            width: 1.25rem;
+            text-align: center;
+            color: var(--nb-muted);
+            transition: color 0.15s ease;
+        }
+        .h24-navbar .dropdown-item:hover,
+        .h24-navbar .dropdown-item:focus,
+        .h24-navbar .dropdown-item:active,
+        .h24-navbar .dropdown-item.active {
+            background-color: transparent;
+            background-image: var(--nb-soft-grad);
+            color: var(--nb-accent);
+        }
+        .h24-navbar .dropdown-item:hover i,
+        .h24-navbar .dropdown-item:focus i,
+        .h24-navbar .dropdown-item.active i { color: var(--nb-rose); }
+        .h24-navbar .dropdown-item.active { font-weight: 600; }
+        .h24-navbar .dropdown-item.h24-logout,
+        .h24-navbar .dropdown-item.h24-logout i { color: var(--nb-danger); }
+        .h24-navbar .dropdown-item.h24-logout:hover,
+        .h24-navbar .dropdown-item.h24-logout:focus { background-color: var(--nb-danger-soft); }
+
+        /* --- Utilities row --- */
+        .h24-navbar .h24-utilities { display: flex; align-items: center; gap: 0.5rem; }
+
+        .h24-navbar .h24-search {
+            display: flex;
+            align-items: center;
+            width: 190px;
+            height: var(--nb-h);
+            margin: 0;
+            padding: 0 0.25rem 0 0.9rem;
+            border: 1px solid var(--nb-border);
+            border-radius: 999px;
+            background: var(--nb-field);
+            transition: border-color 0.18s ease, box-shadow 0.18s ease, width 0.25s ease;
+        }
+        .h24-navbar .h24-search:focus-within {
+            width: 230px;
+            border-color: transparent;
+            background: linear-gradient(var(--nb-menu-bg), var(--nb-menu-bg)) padding-box, var(--nb-grad) border-box;
+            box-shadow: 0 0 0 3px var(--nb-rose-soft);
+        }
+        .h24-navbar .h24-search .form-control {
+            flex: 1 1 auto;
+            min-width: 0;
+            height: 100%;
+            padding: 0;
+            border: 0 !important;
+            border-radius: 0;
+            background: transparent !important;
+            box-shadow: none !important;
+            outline: 0;
+            font-size: 0.9rem;
+            color: var(--nb-strong) !important;
+        }
+        .h24-navbar .h24-search .form-control::placeholder { color: var(--nb-muted) !important; opacity: 1; }
+        .h24-navbar .h24-search-btn {
+            flex: 0 0 auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.9rem;
+            height: 1.9rem;
+            padding: 0;
+            border: 0;
+            border-radius: 50%;
+            background: transparent;
+            color: var(--nb-muted);
+            transition: background-color 0.18s ease, color 0.18s ease;
+        }
+        .h24-navbar .h24-search-btn:hover { background: var(--nb-hl-soft); color: var(--nb-hl-ink); }
+
+        .h24-navbar .h24-icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            width: var(--nb-h);
+            height: var(--nb-h);
+            padding: 0;
+            border: 1px solid var(--nb-border);
+            border-radius: 999px;
+            background: transparent;
+            font: inherit;
+            font-weight: 500;
+            color: var(--nb-text);
+            cursor: pointer;
+            transition: border-color 0.18s ease, color 0.18s ease, background-color 0.18s ease;
+        }
+        .h24-navbar .h24-icon-btn:hover { border-color: var(--nb-hl); color: var(--nb-hl-ink); background: var(--nb-hl-soft); }
+        .h24-navbar .h24-theme-icon { transition: transform 0.25s ease; }
+        .h24-navbar .h24-icon-btn:hover .h24-theme-icon { transform: rotate(18deg); }
+
+        /* Auth buttons */
+        .h24-navbar .h24-auth { display: flex; align-items: center; gap: 0.5rem; }
+        .h24-navbar .h24-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: var(--nb-h);
+            padding: 0 1rem;
+            border: 1px solid transparent;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+        }
+        .h24-navbar .h24-btn-ghost { border-color: var(--nb-border); color: var(--nb-text); }
+        .h24-navbar .h24-btn-ghost:hover { border-color: var(--nb-hl); color: var(--nb-hl-ink); background: var(--nb-hl-soft); }
+        .h24-navbar .h24-btn-primary { background: var(--nb-btn-bg-img); color: var(--nb-btn-text); box-shadow: var(--nb-btn-shadow); }
+        .h24-navbar .h24-btn-primary:hover { filter: brightness(1.05); color: var(--nb-btn-text); transform: translateY(-1px); box-shadow: var(--nb-btn-shadow-hover); }
+
+        /* Avatar */
+        .h24-navbar .h24-account { margin: 0; }
+        .h24-navbar .h24-avatar-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px;
+            border: 2px solid var(--nb-border);
+            border-radius: 999px;
+            background: transparent;
+            color: var(--nb-text);
+            font: inherit;
+            font-weight: 500;
+            cursor: pointer;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease;
+        }
+        .h24-navbar .h24-avatar-btn img { width: 32px; height: 32px; object-fit: cover; }
+        .h24-navbar .h24-avatar-btn:hover,
+        .h24-navbar .show > .h24-avatar-btn {
+            border-color: transparent;
+            background: linear-gradient(var(--nb-menu-bg), var(--nb-menu-bg)) padding-box, var(--nb-grad) border-box;
+            box-shadow: 0 0 0 3px var(--nb-rose-soft);
+        }
+
+        .h24-navbar .h24-section-label {
+            padding: 0.6rem 0.75rem 0.25rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--nb-muted);
+        }
+
+        /* --- Desktop (>= 992px) --- */
+        @media (min-width: 992px) {
+            .h24-navbar .h24-primary { margin-left: auto; margin-right: auto; }
+            .h24-navbar .h24-primary .nav-link::before {
+                content: "";
+                position: absolute;
+                left: 50%;
+                bottom: 2px;
+                width: calc(100% - 1.6rem);
+                height: 2px;
+                border-radius: 2px;
+                background: var(--nb-grad);
+                transform: translateX(-50%) scaleX(0);
+                transition: transform 0.2s ease;
+            }
+            .h24-navbar .h24-primary .nav-link:hover::before { transform: translateX(-50%) scaleX(0.55); }
+            .h24-navbar .h24-primary .nav-link.active::before { transform: translateX(-50%) scaleX(1); }
+            .h24-navbar .dropdown-menu.show { animation: h24-pop 0.15s ease-out; }
+            .h24-navbar .h24-avatar-btn.dropdown-toggle::after { display: none; }
+            /* Label is for screen readers only on desktop (icon-only button) */
+            .h24-navbar .h24-theme-label {
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                margin: -1px;
+                padding: 0;
+                overflow: hidden;
+                clip: rect(0, 0, 0, 0);
+                white-space: nowrap;
+                border: 0;
+            }
+        }
+        @keyframes h24-pop {
+            from { opacity: 0; transform: translateY(-6px); }
+            to   { opacity: 1; transform: none; }
+        }
+
+        /* --- Tablet / small laptop (992px – 1199px): tighten up --- */
+        @media (min-width: 992px) and (max-width: 1199.98px) {
+            .h24-navbar .navbar-brand { margin-right: 0.5rem; font-size: 1.1rem; }
+            .h24-navbar .h24-primary .nav-link { padding: 0.45rem 0.6rem; font-size: 0.9rem; }
+            .h24-navbar .h24-primary .nav-ico { display: none; }
+            .h24-navbar .h24-utilities { gap: 0.4rem; }
+            .h24-navbar .h24-search { width: 140px; }
+            .h24-navbar .h24-search:focus-within { width: 170px; }
+            .h24-navbar .h24-btn { padding: 0 0.8rem; }
+        }
+
+        /* --- Mobile / tablet portrait (< 992px): hamburger menu --- */
+        @media (max-width: 991.98px) {
+            .navbar.h24-navbar { padding: 0.5rem 1rem; }
+            .h24-navbar .h24-toggler { display: inline-flex; }
+            .h24-navbar .navbar-collapse {
+                margin-top: 0.5rem;
+                padding: 0.25rem 0 1rem;
+                border-top: 1px solid var(--nb-border);
+                max-height: calc(100vh - 4.25rem);
+                max-height: calc(100dvh - 4.25rem);
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .h24-navbar .h24-primary .nav-link { padding: 0.7rem 0.75rem; }
+            .h24-navbar .h24-primary .nav-link.active { box-shadow: inset 3px 0 0 var(--nb-focus); }
+            .h24-navbar .dropdown-toggle::after { margin-left: auto; }
+            .h24-navbar .dropdown-menu {
+                position: static;
+                float: none;
+                min-width: 0;
+                margin: 0.125rem 0 0.4rem 1.1rem;
+                padding: 0.15rem 0 0.15rem 0.5rem;
+                border: 0;
+                border-left: 2px solid var(--nb-rule);
+                border-image: linear-gradient(180deg, var(--nb-accent-line), var(--nb-rose)) 1;
+                border-radius: 0;
+                background: transparent;
+                box-shadow: none;
+            }
+            .h24-navbar .h24-utilities { flex-direction: column; align-items: stretch; gap: 0.5rem; margin-top: 0.25rem; }
+            .h24-navbar .h24-utilities > :not(.h24-section-label) { margin-left: 0.25rem; margin-right: 0.25rem; }
+            .h24-navbar .h24-search,
+            .h24-navbar .h24-search:focus-within { width: auto; }
+            .h24-navbar .h24-icon-btn {
+                width: auto;
+                justify-content: flex-start;
+                padding: 0 1rem;
+                border-radius: 12px;
+            }
+            .h24-navbar .h24-theme-icon { width: 1.1em; text-align: center; }
+            .h24-navbar .h24-auth { display: grid; grid-template-columns: 1fr 1fr; }
+            .h24-navbar .h24-avatar-btn { width: 100%; padding: 0.3rem 0.75rem 0.3rem 0.3rem; border-radius: 12px; }
+            .h24-navbar .h24-avatar-btn::after { margin-left: auto; }
+            .h24-navbar .h24-avatar-text { margin-left: 0.65rem; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .h24-navbar *,
+            .h24-navbar *::before,
+            .h24-navbar *::after { transition: none !important; animation: none !important; }
+        }
+
         /* Cards Styling */
         .card, .container-box {
             background-color: var(--card-bg) !important;
@@ -388,65 +902,151 @@
     </div>
 </div>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<a class="h24-skip-link" href="#main-content">Skip to main content</a>
+
+{# ---- Navbar helpers: active-state detection (no new routes needed) ---- #}
+{% set nav_path = request.path %}
+{% set nav_tag = (request.args.get('tag') or '')|lower %}
+{% set nav_on_home = (request.endpoint == 'home' or nav_path == '/') %}
+{% set nav_categories = [
+    {'label': 'Python',         'tag': 'Python',         'icon': 'fa-brands fa-python'},
+    {'label': 'Flask',          'tag': 'Flask',          'icon': 'fa-solid fa-flask'},
+    {'label': 'Java',           'tag': 'Java',           'icon': 'fa-brands fa-java'},
+    {'label': 'Android',        'tag': 'Android',        'icon': 'fa-brands fa-android'},
+    {'label': 'Cybersecurity',  'tag': 'cyber security', 'icon': 'fa-solid fa-shield-halved'},
+    {'label': 'CTF Writeups',   'tag': 'CTF Writeups',   'icon': 'fa-solid fa-flag'}
+] %}
+{% set nav_cat_tags = nav_categories|map(attribute='tag')|map('lower')|list %}
+{% set nav_home_active = nav_on_home and not nav_tag %}
+{% set nav_explore_active = nav_on_home and nav_tag in nav_cat_tags %}
+{% set nav_ai_active = nav_path.startswith(url_for('chatbot_page')) %}
+{% set nav_support_active = nav_path.startswith('/supportus') %}
+{% set nav_more_active = nav_path.startswith('/about') or nav_path.startswith('/contact') %}
+
+<nav class="navbar navbar-expand-lg sticky-top h24-navbar" aria-label="Main navigation">
+
+  {# ---------- Left: brand ---------- #}
   <a class="navbar-brand" href="/">
-    <img src="{{ url_for('static', filename='images/H-24 Blog.png') }}" alt="Logo" width="30" height="30" class="d-inline-block align-top">
-    H-24 Blog
+    <img src="{{ url_for('static', filename='images/H-24 Blog.png') }}" alt="" width="32" height="32">
+    <span class="h24-brand-text"><span class="h24-brand-accent">H-24</span> Blog</span>
   </a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
+
+  <button class="navbar-toggler h24-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fa-solid fa-bars h24-toggler-open" aria-hidden="true"></i>
+    <i class="fa-solid fa-xmark h24-toggler-close" aria-hidden="true"></i>
   </button>
 
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
-        <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
-        <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('chatbot_page') }}">
-                <i class="fa-solid fa-robot mr-1"></i> AI Assistant
-            </a>
-        </li>
+
+    {# ---------- Center: primary navigation ---------- #}
+    <div class="h24-section-label d-lg-none">Browse</div>
+    <ul class="navbar-nav h24-primary">
       <li class="nav-item">
-        <a class="nav-link" href="/supportus">Support us</a>
-      </li>
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          More
+        <a class="nav-link{% if nav_home_active %} active{% endif %}" href="/"{% if nav_home_active %} aria-current="page"{% endif %}>
+          <i class="fa-solid fa-house nav-ico" aria-hidden="true"></i><span>Home</span>
         </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" href="/contact">Contact Us </a>
-          <a class="dropdown-item" href="/account">View profile</a>
-          <a class="dropdown-item" href="/about">About us</a>
-          <div class="dropdown-divider"></div>
-          <a class="dropdown-item" href="https://h-24-gn7z.onrender.com/" target="_blank">H-24 Portal</a>
+      </li>
+
+      <li class="nav-item dropdown">
+        <button type="button" class="nav-link dropdown-toggle{% if nav_explore_active %} active{% endif %}" id="exploreDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fa-solid fa-compass nav-ico" aria-hidden="true"></i><span>Explore</span>
+        </button>
+        <div class="dropdown-menu" aria-labelledby="exploreDropdown">
+          <h6 class="dropdown-header">Browse by topic</h6>
+          {% for c in nav_categories %}
+            {% set c_active = nav_on_home and nav_tag == c.tag|lower %}
+            <a class="dropdown-item{% if c_active %} active{% endif %}" href="{{ url_for('home', tag=c.tag) }}"{% if c_active %} aria-current="page"{% endif %}>
+              <i class="{{ c.icon }}" aria-hidden="true"></i>{{ c.label }}
+            </a>
+          {% endfor %}
         </div>
       </li>
+
+      {% if current_user.is_authenticated %}
       <li class="nav-item">
-        <a class="nav-link disabled" href="#">Download App(Coming soon)</a>
+        <a class="nav-link{% if nav_ai_active %} active{% endif %}" href="{{ url_for('chatbot_page') }}"{% if nav_ai_active %} aria-current="page"{% endif %}>
+          <i class="fa-solid fa-robot nav-ico" aria-hidden="true"></i><span>AI Assistant</span>
+        </a>
+      </li>
+      {% endif %}
+
+      <li class="nav-item">
+        <a class="nav-link{% if nav_support_active %} active{% endif %}" href="/supportus"{% if nav_support_active %} aria-current="page"{% endif %}>
+          <i class="fa-solid fa-heart nav-ico" aria-hidden="true"></i><span>Support Us</span>
+        </a>
+      </li>
+
+      <li class="nav-item dropdown">
+        <button type="button" class="nav-link dropdown-toggle{% if nav_more_active %} active{% endif %}" id="moreDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fa-solid fa-ellipsis nav-ico" aria-hidden="true"></i><span>More</span>
+        </button>
+        <div class="dropdown-menu" aria-labelledby="moreDropdown">
+          <a class="dropdown-item{% if nav_path.startswith('/about') %} active{% endif %}" href="/about"{% if nav_path.startswith('/about') %} aria-current="page"{% endif %}>
+            <i class="fa-solid fa-circle-info" aria-hidden="true"></i>About Us
+          </a>
+          <a class="dropdown-item{% if nav_path.startswith('/contact') %} active{% endif %}" href="/contact"{% if nav_path.startswith('/contact') %} aria-current="page"{% endif %}>
+            <i class="fa-solid fa-envelope" aria-hidden="true"></i>Contact Us
+          </a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="https://h-24-gn7z.onrender.com/" target="_blank" rel="noopener noreferrer">
+            <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>H-24 Portal<span class="sr-only"> (opens in a new tab)</span>
+          </a>
+        </div>
       </li>
     </ul>
-    
-    <form class="form-inline my-2 my-lg-0" action="/searchuser" method="post">
-        <input class="form-control mr-sm-2" type="search" placeholder="Search profile " aria-label="Search" name="userName">
-        <button class="btn btn-outline-success my-2 my-sm-0 mx-2" type="submit">Search</button>
-        <button id="theme-toggle" type="button" class="btn btn-outline-secondary btn-sm mx-2">
-                🌙 Dark Mode
+
+    {# ---------- Right: utilities + account ---------- #}
+    <div class="h24-utilities">
+
+      <div class="h24-section-label d-lg-none">Search &amp; theme</div>
+      <form class="h24-search" action="/searchuser" method="post" role="search">
+        <label for="navSearchInput" class="sr-only">Search profiles</label>
+        <input id="navSearchInput" class="form-control" type="search" name="userName" placeholder="Search profiles" autocomplete="off">
+        <button class="h24-search-btn" type="submit" aria-label="Search">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
         </button>
-    </form>
-    
-    {% if current_user.is_authenticated %}
-        <a href="{{ url_for('account') }}" class="btn btn-outline-primary p-1 mr-2">
-            <img src="{{ profile_image }}" alt="Profile" width="28" height="28" class="rounded-circle">
-        </a>
-        <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">Log Out</a>
-    {% else %}
-        <a href="{{ url_for('login') }}" class="btn btn-outline-success mr-2">Log In</a>
-        <a href="{{ url_for('register') }}" class="btn btn-outline-success mx-2">Register</a>
-    {% endif %}
+      </form>
+
+      <button id="theme-toggle" type="button" class="h24-icon-btn" title="Switch to dark mode">
+        <i class="fa-solid fa-moon h24-theme-icon" aria-hidden="true"></i>
+        <span class="h24-theme-label">Dark Mode</span>
+      </button>
+
+      <div class="h24-section-label d-lg-none">Account</div>
+      {% if current_user.is_authenticated %}
+        <ul class="navbar-nav h24-account">
+          <li class="nav-item dropdown">
+            <button type="button" class="h24-avatar-btn dropdown-toggle" id="accountDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Account menu">
+              <img src="{{ profile_image }}" alt="" width="32" height="32" class="rounded-circle">
+              <span class="h24-avatar-text d-lg-none">My account</span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="accountDropdown">
+              <a class="dropdown-item{% if nav_path.startswith('/account') %} active{% endif %}" href="{{ url_for('account') }}"{% if nav_path.startswith('/account') %} aria-current="page"{% endif %}>
+                <i class="fa-solid fa-user" aria-hidden="true"></i>View Profile
+              </a>
+              {% if current_user.is_verified %}
+                <a class="dropdown-item" href="{{ url_for('new_post') }}">
+                  <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>New Post
+                </a>
+              {% endif %}
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item h24-logout" href="{{ url_for('logout') }}">
+                <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>Log Out
+              </a>
+            </div>
+          </li>
+        </ul>
+      {% else %}
+        <div class="h24-auth">
+          <a class="h24-btn h24-btn-ghost" href="{{ url_for('login') }}">Log In</a>
+          <a class="h24-btn h24-btn-primary" href="{{ url_for('register') }}">Register</a>
+        </div>
+      {% endif %}
+    </div>
   </div>
 </nav>
 
-<div class="container mt-4">
+<div class="container mt-4" id="main-content" tabindex="-1">
     <div class="row">
         <div class="container mt-3">
             {% with messages = get_flashed_messages(with_categories=true) %}
@@ -643,21 +1243,36 @@
     const themeToggleBtn = document.getElementById('theme-toggle');
     const htmlElement = document.documentElement;
 
-    if (localStorage.getItem('theme') === 'dark') {
-        themeToggleBtn.textContent = '☀️ Light Mode';
+    // Keeps the toggle's icon, label and tooltip in sync with the active theme
+    function syncThemeToggle() {
+        if (!themeToggleBtn) return;
+        const isDark = htmlElement.classList.contains('dark-mode');
+        const icon = themeToggleBtn.querySelector('.h24-theme-icon');
+        const label = themeToggleBtn.querySelector('.h24-theme-label');
+        const nextMode = isDark ? 'Light Mode' : 'Dark Mode';
+
+        if (icon) {
+            icon.classList.toggle('fa-sun', isDark);
+            icon.classList.toggle('fa-moon', !isDark);
+        }
+        if (label) label.textContent = nextMode;
+        themeToggleBtn.title = 'Switch to ' + nextMode.toLowerCase();
     }
 
-    themeToggleBtn.addEventListener('click', () => {
-        htmlElement.classList.toggle('dark-mode');
-        
-        if (htmlElement.classList.contains('dark-mode')) {
-            localStorage.setItem('theme', 'dark');
-            themeToggleBtn.textContent = '☀️ Light Mode';
-        } else {
-            localStorage.setItem('theme', 'light');
-            themeToggleBtn.textContent = '🌙 Dark Mode';
-        }
-    });
+    syncThemeToggle();
+
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', () => {
+            htmlElement.classList.toggle('dark-mode');
+
+            if (htmlElement.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+            } else {
+                localStorage.setItem('theme', 'light');
+            }
+            syncThemeToggle();
+        });
+    }
 </script>
 </body>
 </html>

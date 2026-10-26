@@ -2,6 +2,11 @@
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='account.css') }}">
 
+{# Shows validation errors under a form field (safe if the field doesn't exist) #}
+{% macro field_errors(field) %}
+  {% if field %}{% for error in field.errors %}<small class="text-danger d-block">{{ error }}</small>{% endfor %}{% endif %}
+{% endmacro %}
+
 {% if type == "special" %}
     {% set role_class = "role-special" %}
     {% set role_label = "Special Creator" %}
@@ -18,6 +23,59 @@
     {% set role_class = "role-normal" %}
     {% set role_label = "Free Member" %}
 {% endif %}
+
+{# Only http(s) links are allowed in the GitHub chip (blocks javascript: URLs) #}
+{% set github_url = (current_user.github_link or '')|trim %}
+{% set github_ok = github_url.lower().startswith(('http://', 'https://')) %}
+
+{# Accent presets for the admin "Customize" panel #}
+{% set acc_presets = [
+    {'key': 'default', 'label': 'Original', 'from': '#58c82c', 'to': '#2f9e44'},
+    {'key': 'neon',    'label': 'Neon',     'from': '#22d3ee', 'to': '#ff4d9d'},
+    {'key': 'ocean',   'label': 'Ocean',    'from': '#38bdf8', 'to': '#6366f1'},
+    {'key': 'rose',    'label': 'Rose',     'from': '#ff8ec4', 'to': '#e11d74'},
+    {'key': 'gold',    'label': 'Gold',     'from': '#f5d36b', 'to': '#d4a017'},
+    {'key': 'mint',    'label': 'Mint',     'from': '#5eead4', 'to': '#22c55e'}
+] %}
+
+<style>
+    .acc-hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+    .acc-posts-heading { display: inline-block; color: var(--acc-from, rgb(88, 200, 44)); }
+
+    /* ---- Admin customization (classes are toggled on .acc-page by the script below) ---- */
+    .acc-page.acc-custom .acc-hero { border-top: 3px solid var(--acc-from); }
+    .acc-page.acc-custom .avatar-img { outline: 3px solid var(--acc-from); outline-offset: 3px; }
+    .acc-page.acc-custom .acc-posts-heading {
+        background: linear-gradient(90deg, var(--acc-from), var(--acc-to));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+    .acc-page.acc-custom .user-posts-section .btn-outline-primary { color: var(--acc-from); border-color: var(--acc-from); }
+    .acc-page.acc-custom .user-posts-section .btn-outline-primary:hover { background: var(--acc-from); border-color: var(--acc-from); color: #111; }
+    .acc-page.acc-avatar-square .avatar-img,
+    .acc-page.acc-avatar-square .avatar-ring { border-radius: 22% !important; }
+    .acc-page.acc-posts-list .user-posts-section .col-md-4 { flex: 0 0 100%; max-width: 100%; }
+    .acc-page.acc-hide-email .hero-email { display: none; }
+    .acc-page.acc-hide-github .meta-chip-github { display: none; }
+    .acc-page.acc-hide-posts .user-posts-section { display: none; }
+
+    /* ---- Customize modal controls ---- */
+    .acc-fieldset { border: 0; padding: 0; margin: 0 0 1.25rem; min-width: 0; }
+    .acc-legend { width: auto; margin-bottom: 0.5rem; font-size: 0.95rem; font-weight: 600; }
+    .acc-swatches { display: flex; flex-wrap: wrap; gap: 0.9rem; }
+    .acc-swatch { position: relative; display: flex; flex-direction: column; align-items: center; gap: 0.4rem; margin: 0; font-size: 0.8rem; cursor: pointer; }
+    .acc-swatch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+    .acc-swatch-dot {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--from), var(--to));
+        box-shadow: 0 0 0 1px rgba(128, 128, 128, 0.45);
+    }
+    .acc-swatch input:checked + .acc-swatch-dot { outline: 2px solid currentColor; outline-offset: 2px; }
+    .acc-swatch input:focus-visible + .acc-swatch-dot { box-shadow: 0 0 0 1px rgba(128, 128, 128, 0.45), 0 0 0 6px rgba(34, 211, 238, 0.55); }
+</style>
 
 <!-- Parent wrapper jo poore page ko cover karega -->
 <div class="acc-page {{ role_class }}" data-role="{{ type }}">
@@ -46,10 +104,10 @@
         <div class="hero-info">
           <h1 class="hero-username">{{ current_user.username }}</h1>
           <p class="hero-email">{{ current_user.email }}</p>
-          
+
           {% if current_user.bio %}
           <div class="hero-bio mt-2 mb-2">
-            <p class="text-muted"><i class="fas fa-info-circle me-1"></i> {{ current_user.bio }}</p>
+            <p class="text-muted"><i class="fas fa-info-circle mr-1"></i> {{ current_user.bio }}</p>
           </div>
           {% endif %}
 
@@ -58,15 +116,15 @@
               <span class="meta-label">Account Type</span>
               <span class="meta-value">{{ role_label }}</span>
             </div>
-            
+
             <div class="meta-chip">
-              <span class="meta-label"></span>
+              <span class="meta-label">Email</span>
               <span class="meta-value">
                 {% if not current_user.is_verified %}
-                    <a class="btn-edit-profile" href="/sendverifaction">Verify Email</a>  
-                {%else%}
+                    <a class="btn-edit-profile" href="/sendverifaction">Verify Email</a>
+                {% else %}
                     Verified Email 💞
-                {%endif%}
+                {% endif %}
               </span>
             </div>
 
@@ -75,11 +133,11 @@
               <span class="meta-value status-active">Active</span>
             </div>
 
-            {% if current_user.github_link %}
-            <div class="meta-chip">
+            {% if github_ok %}
+            <div class="meta-chip meta-chip-github">
               <span class="meta-label">GitHub</span>
               <span class="meta-value">
-                <a href="{{ current_user.github_link }}" target="_blank" class="text-decoration-none">
+                <a href="{{ github_url }}" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
                   <i class="fab fa-github"></i> Profile
                 </a>
               </span>
@@ -88,28 +146,35 @@
           </div>
         </div>
 
-        <button type="button" class="btn-edit-profile" data-toggle="modal" data-target="#updateProfileModal">
-          Edit Profile
-        </button>
+        <div class="acc-hero-actions">
+          <button type="button" class="btn-edit-profile" data-toggle="modal" data-target="#updateProfileModal">
+            Edit Profile
+          </button>
+          {% if type == "admin" %}
+          <button type="button" class="btn-edit-profile" data-toggle="modal" data-target="#customizeModal">
+            <i class="fas fa-sliders-h mr-1" aria-hidden="true"></i> Customize page
+          </button>
+          {% endif %}
+        </div>
       </div>
     </div>
 
     <!-- Free / normal members section -->
     {% if type == "normal" %}
-    <div class="row g-4 role-section">
-      <div class="col-md-6">
+    <div class="row role-section">
+      <div class="col-md-6 mb-4">
         <div class="glass-card info-card">
           <h4>Welcome aboard 👋</h4>
           <p>You're on the Free plan. Fill out your profile and explore the community to get the most out of your account.</p>
         </div>
       </div>
-      <div class="col-md-6">
+      <div class="col-md-6 mb-4">
         <div class="glass-card info-card">
           <h4>Level up</h4>
           <p>Active members, contributors, and researchers can request a Premium Profile with extra badges and perks.</p>
         </div>
       </div>
-      <div class="col-12">
+      <div class="col-12 mb-4">
         <div class="glass-card premium-upsell">
           <h3>Want a Premium Profile?</h3>
           <p>Premium profiles are available for developers, creators, ethical hackers, security researchers, and open-source contributors.</p>
@@ -123,11 +188,11 @@
 
     <!-- Post card on user profile -->
     <div class="user-posts-section mt-5">
-      <h3 class="mb-4" style="color: rgb(88, 200, 44);"><i class="fas fa-layer-group me-2"></i> My Posts</h3>
-      <div class="row g-4">
+      <h3 class="mb-4 acc-posts-heading"><i class="fas fa-layer-group mr-2"></i> My Posts</h3>
+      <div class="row">
         {% if posts %}
             {% for post in posts %}
-            <div class="col-md-4">
+            <div class="col-md-4 mb-4">
               <div class="glass-card p-3 d-flex flex-column justify-content-between" style="height: 100%;">
                 <h5 class="post-title mb-3">{{ post.title }}</h5>
                 <div>
@@ -157,7 +222,7 @@
     <div class="modal-content acc-modal-content">
       <div class="modal-header acc-modal-header">
         <h5 class="modal-title" id="updateProfileLabel">
-          <i class="fas fa-user-edit me-2"></i> Update Profile
+          <i class="fas fa-user-edit mr-2"></i> Update Profile
         </h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
@@ -167,24 +232,24 @@
       <form method="POST" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         <div class="modal-body acc-modal-body">
-          
+
           <div class="form-group mb-3">
             {{ form.username.label(class="form-label") }}
             {{ form.username(class="form-control acc-input", placeholder="Enter your username") }}
+            {{ field_errors(form.username) }}
           </div>
 
           <div class="form-group mb-3">
             {{ form.profile_pic.label(class="form-label") }}
             {{ form.profile_pic(class="form-control acc-input") }}
-            {% for error in form.profile_pic.errors %}
-                <small class="text-danger">{{ error }}</small>
-            {% endfor %}
+            {{ field_errors(form.profile_pic) }}
           </div>
 
           <div class="form-group mb-3">
             {{ form.bio.label(class="form-label") if form.bio else '<label class="form-label">Bio / About Me</label>'|safe }}
             {% if form.bio %}
               {{ form.bio(class="form-control acc-input", rows="3", placeholder="Tell a little bit about yourself...") }}
+              {{ field_errors(form.bio) }}
             {% else %}
               <textarea class="form-control acc-input" name="bio" rows="3" placeholder="Tell a little bit about yourself..."></textarea>
             {% endif %}
@@ -194,6 +259,7 @@
             {{ form.github_link.label(class="form-label") if form.github_link else '<label class="form-label">GitHub Profile</label>'|safe }}
             {% if form.github_link %}
               {{ form.github_link(class="form-control acc-input", placeholder="https://github.com/yourusername") }}
+              {{ field_errors(form.github_link) }}
             {% else %}
               <input type="url" class="form-control acc-input" name="github_link" placeholder="https://github.com/yourusername">
             {% endif %}
@@ -207,12 +273,177 @@
       </form>
     </div>
   </div>
-</div>  
+</div>
+
+{% if type == "admin" %}
+<!-- Admin-only: customize your own account page -->
+<div class="modal fade" id="customizeModal" tabindex="-1" role="dialog" aria-labelledby="customizeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content acc-modal-content">
+      <div class="modal-header acc-modal-header">
+        <h5 class="modal-title" id="customizeModalLabel">
+          <i class="fas fa-sliders-h mr-2" aria-hidden="true"></i> Customize your account page
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body acc-modal-body">
+        <p class="small text-muted">Changes apply instantly, only on your own account page, and are remembered on this browser.</p>
+
+        <fieldset class="acc-fieldset">
+          <legend class="acc-legend">Accent color</legend>
+          <div class="acc-swatches">
+            {% for p in acc_presets %}
+            <label class="acc-swatch">
+              <input type="radio" name="acc-accent" value="{{ p.key }}"{% if p.key == 'default' %} checked{% endif %}>
+              <span class="acc-swatch-dot" style="--from: {{ p.from }}; --to: {{ p.to }};"></span>
+              <span>{{ p.label }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </fieldset>
+
+        <fieldset class="acc-fieldset">
+          <legend class="acc-legend">Profile picture shape</legend>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="acc-avatar" id="acc-avatar-circle" value="circle" checked>
+            <label class="form-check-label" for="acc-avatar-circle">Circle</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="acc-avatar" id="acc-avatar-square" value="square">
+            <label class="form-check-label" for="acc-avatar-square">Rounded square</label>
+          </div>
+        </fieldset>
+
+        <fieldset class="acc-fieldset">
+          <legend class="acc-legend">Posts layout</legend>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="acc-posts" id="acc-posts-grid" value="grid" checked>
+            <label class="form-check-label" for="acc-posts-grid">Grid</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="acc-posts" id="acc-posts-list" value="list">
+            <label class="form-check-label" for="acc-posts-list">List</label>
+          </div>
+        </fieldset>
+
+        <fieldset class="acc-fieldset mb-0">
+          <legend class="acc-legend">Show on this page</legend>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="acc-show-email" checked>
+            <label class="form-check-label" for="acc-show-email">Email address</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="acc-show-github" checked>
+            <label class="form-check-label" for="acc-show-github">GitHub link</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="acc-show-posts" checked>
+            <label class="form-check-label" for="acc-show-posts">My posts section</label>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="modal-footer acc-modal-footer">
+        <span class="small text-muted mr-auto" id="acc-save-note" role="status" aria-live="polite"></span>
+        <button type="button" class="btn btn-secondary" id="acc-reset">Reset to default</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Done</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var page = document.querySelector('.acc-page');
+  var modal = document.getElementById('customizeModal');
+  if (!page || !modal) return;
+
+  var KEY = 'h24_account_prefs_{{ current_user.id }}';
+  var PRESETS = {};
+  {{ acc_presets|tojson }}.forEach(function (p) { PRESETS[p.key] = p; });
+
+  var DEFAULTS = { accent: 'default', avatar: 'circle', posts: 'grid', showEmail: true, showGithub: true, showPosts: true };
+  var note = document.getElementById('acc-save-note');
+
+  function load() {
+    var saved = {};
+    try { saved = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { saved = {}; }
+    var p = Object.assign({}, DEFAULTS, saved);
+    if (!PRESETS[p.accent]) p.accent = DEFAULTS.accent;
+    if (p.avatar !== 'circle' && p.avatar !== 'square') p.avatar = DEFAULTS.avatar;
+    if (p.posts !== 'grid' && p.posts !== 'list') p.posts = DEFAULTS.posts;
+    ['showEmail', 'showGithub', 'showPosts'].forEach(function (k) { p[k] = p[k] !== false; });
+    return p;
+  }
+
+  function apply(p) {
+    var custom = p.accent !== 'default';
+    page.classList.toggle('acc-custom', custom);
+    if (custom) {
+      page.style.setProperty('--acc-from', PRESETS[p.accent].from);
+      page.style.setProperty('--acc-to', PRESETS[p.accent].to);
+    } else {
+      page.style.removeProperty('--acc-from');
+      page.style.removeProperty('--acc-to');
+    }
+    page.classList.toggle('acc-avatar-square', p.avatar === 'square');
+    page.classList.toggle('acc-posts-list', p.posts === 'list');
+    page.classList.toggle('acc-hide-email', !p.showEmail);
+    page.classList.toggle('acc-hide-github', !p.showGithub);
+    page.classList.toggle('acc-hide-posts', !p.showPosts);
+  }
+
+  function syncForm(p) {
+    modal.querySelector('input[name="acc-accent"][value="' + p.accent + '"]').checked = true;
+    modal.querySelector('input[name="acc-avatar"][value="' + p.avatar + '"]').checked = true;
+    modal.querySelector('input[name="acc-posts"][value="' + p.posts + '"]').checked = true;
+    document.getElementById('acc-show-email').checked = p.showEmail;
+    document.getElementById('acc-show-github').checked = p.showGithub;
+    document.getElementById('acc-show-posts').checked = p.showPosts;
+  }
+
+  function readForm() {
+    return {
+      accent: modal.querySelector('input[name="acc-accent"]:checked').value,
+      avatar: modal.querySelector('input[name="acc-avatar"]:checked').value,
+      posts: modal.querySelector('input[name="acc-posts"]:checked').value,
+      showEmail: document.getElementById('acc-show-email').checked,
+      showGithub: document.getElementById('acc-show-github').checked,
+      showPosts: document.getElementById('acc-show-posts').checked
+    };
+  }
+
+  function say(text) { if (note) note.textContent = text; }
+
+  var prefs = load();
+  syncForm(prefs);
+  apply(prefs);
+
+  modal.addEventListener('change', function () {
+    var p = readForm();
+    apply(p);
+    try { localStorage.setItem(KEY, JSON.stringify(p)); say('Saved on this browser'); }
+    catch (e) { say('Could not save (browser storage is blocked)'); }
+  });
+
+  document.getElementById('acc-reset').addEventListener('click', function () {
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    syncForm(DEFAULTS);
+    apply(DEFAULTS);
+    say('Reset to default');
+  });
+})();
+</script>
+{% endif %}
 
 {% if form.errors %}
 <script>
-  $(document).ready(function () {
-    $('#updateProfileModal').modal('show');
+  // jQuery/Bootstrap load at the end of layout.html, so wait for the window "load" event
+  window.addEventListener('load', function () {
+    jQuery('#updateProfileModal').modal('show');
   });
 </script>
 {% endif %}
